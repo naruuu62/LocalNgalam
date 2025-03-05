@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "497053976903",
+    "firebase_url": "https://naru-c8575-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "naru-c8575",
+    "storage_bucket": "naru-c8575.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497053976903:android:45d455f7e7f309938ce462",
+        "android_client_info": {
+          "package_name": "com.example.localngalam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdwfQN08PYImJdI3bdRuB8ntCNYxXXCWg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497053976903:android:c8f9165c94fd6ffc8ce462",
+        "android_client_info": {
+          "package_name": "com.example.sosmedfinal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdwfQN08PYImJdI3bdRuB8ntCNYxXXCWg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
