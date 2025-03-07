@@ -1,10 +1,21 @@
-package com.example.localngalam.ui.theme
+package com.example.localngalam.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.localngalam.R
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
+
+
+val poppinsFont = FontFamily(
+    Font(R.font.poppins_regular, FontWeight.Normal),
+    Font(R.font.poppins_bold, FontWeight.Bold),
+    Font(R.font.poppins_semibold, FontWeight.SemiBold),
+    Font(R.font.poppins_italic,FontWeight.Normal, FontStyle.Italic)
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(
