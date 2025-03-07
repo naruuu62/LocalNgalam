@@ -18,6 +18,11 @@ class autentikasi : ViewModel() {
                 .addOnCompleteListener { task ->
                     lloginState.value = task.isSuccessful
                 }
+                .addOnFailureListener { exception ->
+                    viewModelScope.launch {
+                        lloginState.value = false
+                    }
+                }
         }
     }
 
