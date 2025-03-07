@@ -2,36 +2,53 @@ package com.example.localngalam.presentation.register
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.localngalam.R
+import com.example.localngalam.autentikasi
 import com.example.localngalam.presentation.GoogleSignUpButton
 import com.example.localngalam.presentation.GreenButttonRegisterLogin
 import com.example.localngalam.presentation.OrDivider
 import com.example.localngalam.presentation.TextFieldRegisterLoginScreen
 import com.example.localngalam.presentation.ui.theme.Blue
+import com.example.localngalam.presentation.ui.theme.Warning
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 
 @Composable
-fun RegisterScreen(navController: NavHostController, modifier: Modifier = Modifier) {
+fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, authViewModel:  autentikasi = viewModel()) {
     var email by remember { mutableStateOf("") }
     var namaLengkap by remember { mutableStateOf("") }
     var noTelepon by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val loginState by authViewModel.loginState.collectAsState()
+    var isRegistWrong by remember {mutableStateOf(false)}
+    val focusManager = LocalFocusManager.current
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()
+        .pointerInput(Unit){
+detectTapGestures(onTap = {
+focusManager.clearFocus(force = true)
+})
+        }) {
+
         Image(
             painter = painterResource(id = R.drawable.background_login_register),
             contentDescription = "",
@@ -112,14 +129,43 @@ fun RegisterScreen(navController: NavHostController, modifier: Modifier = Modifi
                     placeholderText = "Kata Sandi",
                     leadingIcon = R.drawable.ic_password
                 )
+                Spacer(modifier = Modifier.height(51.dp))
 
-                Spacer(modifier = Modifier.height(57.dp))
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .height(24.dp)
+                        .alpha(if (isRegistWrong) 1f else 0f)
+                ){
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_warning),
+                        contentDescription = ""
+                    )
+                    Text(
+                        text = "Password minimal 8 karakter",
+                        color = Warning,
+                        fontSize = 12.sp,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
 
 
                 GreenButttonRegisterLogin(
                     text = "Sign Up",
                     onClick = {
-                        /* DAFTAR AKUN */
+                        if (password.isEmpty() || email.isEmpty() || password.length < 8) {
+                            isRegistWrong = true
+                        } else {
+                            authViewModel.register(email, password)
+
+                            if (loginState == true) {
+                                navController.navigate("home")
+                            } else {
+                                isRegistWrong = true
+                            }
+                            /* DAFTAR AKUN */
+                        }
                     }
                 )
 
@@ -155,6 +201,7 @@ fun RegisterScreen(navController: NavHostController, modifier: Modifier = Modifi
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .clickable {
+                                navController.navigate("login")
                                 // ke page Login
 
                             }

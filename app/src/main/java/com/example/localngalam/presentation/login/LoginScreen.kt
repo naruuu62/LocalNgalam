@@ -2,6 +2,7 @@ package com.example.localngalam.presentation.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -9,15 +10,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.localngalam.R
+import com.example.localngalam.autentikasi
 import com.example.localngalam.presentation.GoogleSignUpButton
 import com.example.localngalam.presentation.GreenButttonRegisterLogin
 import com.example.localngalam.presentation.OrDivider
@@ -29,12 +34,19 @@ import com.example.localngalam.presentation.ui.theme.Warning
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 
 @Composable
-fun LoginScreen(navController: NavController,modifier: Modifier = Modifier) {
+fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  authViewModel: autentikasi = viewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordWrong by remember { mutableStateOf(false) }
+    val loginState by authViewModel.loginState.collectAsState()
+    val focusManager = LocalFocusManager.current
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus(force = true)
+            })
+        }) {
         Image(
             painter = painterResource(id = R.drawable.background_login_register),
             contentDescription = "",
@@ -111,7 +123,7 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier) {
                         .align(Alignment.End)
                         .padding(horizontal = 16.dp)
                         .clickable {
-
+                            navController.navigate("register")
                     }
                 )
 
@@ -143,8 +155,20 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier) {
                     text = "Masuk",
                     onClick = {
                         /* login akun biasa */
+                        if (password.isEmpty() || email.isEmpty()) {
+                            isPasswordWrong = true
+                        } else {
+                            authViewModel.login(email, password)
+
+                            if (loginState == true) {
+                                navController.navigate("home")
+                            } else {
+                                isPasswordWrong = true
+                            }
+                    }
                     }
                 )
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -179,6 +203,7 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .clickable {
                                 // ke page register
+                                navController.navigate("register")
 
                             }
                     )
