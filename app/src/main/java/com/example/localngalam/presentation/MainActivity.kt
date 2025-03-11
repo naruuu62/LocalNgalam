@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             SplashScreenHandler()
             MainScreen(navController = navController)
+//<<<<<<< dirga
         }
     }
 }
@@ -33,3 +34,9 @@ fun SplashScreenHandler() {
         isLoading = false
     }
 }
+//=======
+
+        }
+    }
+}
+//>>>>>>> main
