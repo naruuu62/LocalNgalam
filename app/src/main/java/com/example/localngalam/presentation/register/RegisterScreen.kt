@@ -25,7 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.localngalam.R
 import com.example.localngalam.autentikasi
 import com.example.localngalam.presentation.GoogleSignUpButton
-import com.example.localngalam.presentation.GreenButttonRegisterLogin
+import com.example.localngalam.presentation.GreenButtonRegisterLogin
 import com.example.localngalam.presentation.OrDivider
 import com.example.localngalam.presentation.TextFieldRegisterLoginScreen
 import com.example.localngalam.presentation.ui.theme.Blue
@@ -42,11 +42,20 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
     var isRegistWrong by remember {mutableStateOf(false)}
     val focusManager = LocalFocusManager.current
 
+//<<<<<<< dirga
+    Box(modifier = modifier
+        .fillMaxSize()
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus(force = true)
+            })
+//=======
     Box(modifier = modifier.fillMaxSize()
         .pointerInput(Unit){
 detectTapGestures(onTap = {
 focusManager.clearFocus(force = true)
 })
+//>>>>>>> main
         }) {
 
         Image(
@@ -151,7 +160,7 @@ focusManager.clearFocus(force = true)
                 Spacer(modifier = Modifier.height(6.dp))
 
 
-                GreenButttonRegisterLogin(
+                GreenButtonRegisterLogin(
                     text = "Sign Up",
                     onClick = {
                         if (password.isEmpty() || email.isEmpty() || password.length < 8) {
@@ -207,10 +216,7 @@ focusManager.clearFocus(force = true)
                             }
                     )
                 }
-
-
             }
         }
     }
 }
-

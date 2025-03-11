@@ -1,15 +1,11 @@
 package com.example.localngalam.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -19,14 +15,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -34,18 +34,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.localngalam.R
-import com.example.localngalam.presentation.ui.theme.Blue
-import com.example.localngalam.presentation.ui.theme.DividerColor
-import com.example.localngalam.presentation.ui.theme.Green
-import com.example.localngalam.presentation.ui.theme.NotFilled
-import com.example.localngalam.presentation.ui.theme.poppinsFont
+import com.example.localngalam.presentation.ui.theme.*
 
 @Composable
 fun TextFieldRegisterLoginScreen(
     value: String,
     onValueChange: (String) -> Unit,
     placeholderText: String,
-    leadingIcon: Int,
+    leadingIcon: Int? = null,
     modifier: Modifier = Modifier
 ) { val focusManager = LocalFocusManager.current
     TextField(
@@ -62,21 +58,23 @@ fun TextFieldRegisterLoginScreen(
         placeholder = {
             Text(
                 text = placeholderText,
-                color = NotFilled,
+                color = NotFilledText,
                 fontSize = 12.sp,
                 fontFamily = poppinsFont,
                 fontWeight = FontWeight.Normal
             )
         },
-        leadingIcon = {
-            Icon(
-                painter = painterResource(id = leadingIcon),
-                contentDescription = null,
-                tint = Blue,
-                modifier = Modifier
-                    .padding(vertical = 15.dp)
-                    .padding(horizontal = 20.dp)
-            )
+        leadingIcon = leadingIcon?.let {
+            {
+                Icon(
+                    painter = painterResource(id = it),
+                    contentDescription = null,
+                    tint = Blue,
+                    modifier = Modifier
+                        .padding(vertical = 15.dp)
+                        .padding(horizontal = 20.dp)
+                )
+            }
         },
         singleLine = true,
         shape = RoundedCornerShape(17.dp),
@@ -99,7 +97,7 @@ fun TextFieldRegisterLoginScreenWithEye(
     value: String = "text",
     onValueChange: (String) -> Unit = {},
     placeholderText: String = "text",
-    leadingIcon: Int=R.drawable.ic_password,
+    leadingIcon: Int? = null,
     modifier: Modifier = Modifier
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
@@ -116,19 +114,21 @@ onNext = {focusManager.moveFocus(FocusDirection.Down)}
         placeholder = {
             Text(
                 text = placeholderText,
-                color = NotFilled,
+                color = NotFilledText,
                 fontSize = 12.sp,
                 fontFamily = poppinsFont,
                 fontWeight = FontWeight.Normal
             )
         },
-        leadingIcon = {
-            Icon(
-                painter = painterResource(id = leadingIcon),
-                contentDescription = "Password Icon",
-                tint = Blue,
-                modifier = Modifier.padding(vertical = 15.dp, horizontal = 20.dp)
-            )
+        leadingIcon = leadingIcon?.let {
+            {
+                Icon(
+                    painter = painterResource(id = it),
+                    contentDescription = "Leading Icon",
+                    tint = Blue,
+                    modifier = Modifier.padding(vertical = 15.dp, horizontal = 20.dp)
+                )
+            }
         },
         trailingIcon = {
             val iconRes = if (passwordVisible) R.drawable.ic_open_eye else R.drawable.ic_close_eye
@@ -162,22 +162,24 @@ onNext = {focusManager.moveFocus(FocusDirection.Down)}
 }
 
 @Composable
-fun GreenButttonRegisterLogin(
+fun GreenButtonRegisterLogin(
     text: String = "Button",
     onClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = false
 ) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(17.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Green,
+            disabledContainerColor = NotFilled
         ),
         modifier = modifier
             .width(351.dp)
             .height(54.dp)
-            .shadow(4.dp, shape = RoundedCornerShape(17.dp))
-            .background(Color.White.copy(alpha = 0.25f), shape = RoundedCornerShape(16.dp))
+            .shadow(4.dp, shape = RoundedCornerShape(17.dp)),
+        enabled = isEnabled
     ) {
         Text(
             text = text,
@@ -250,17 +252,90 @@ fun GoogleSignUpButton(
                 fontWeight = FontWeight.SemiBold,
                 color = Color.White
             )
-
-
         }
+    }
+}
 
+@Composable
+fun OtpComponent(
+    correctOtp: String,
+    onOtpEntered: (Boolean) -> Unit
+) {
+    var otpValues = remember { mutableStateListOf("", "", "", "") }
+    val focusManager = LocalFocusManager.current
+    val focusRequesters = remember { List(otpValues.size) { FocusRequester() } }
+
+    Row(horizontalArrangement = Arrangement.spacedBy(29.dp)) {
+        otpValues.forEachIndexed { index, value ->
+            OutlinedTextField(
+                value = value,
+                onValueChange = { newValue ->
+                    val intValue = newValue.toIntOrNull()
+
+                    when {
+                        intValue != null && newValue.length == 1 && value.isEmpty() -> {
+                            otpValues[index] = newValue
+                            if (index < otpValues.lastIndex) {
+                                focusRequesters[index + 1].requestFocus()
+                            }
+                        }
+                        newValue.isEmpty() -> {
+                            otpValues[index] = ""
+                            if (index > 0) {
+                                focusRequesters[index - 1].requestFocus()
+                            }
+                        }
+                    }
+
+                    val enteredOtp = otpValues.joinToString("")
+                    if (enteredOtp.length == correctOtp.length) {
+                        onOtpEntered(enteredOtp == correctOtp)
+                    }
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = if (index == otpValues.lastIndex) ImeAction.Done else ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { if (index < otpValues.lastIndex) focusRequesters[index + 1].requestFocus() },
+                    onDone = { focusManager.clearFocus() }
+                ),
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 40.sp,
+                    fontFamily = poppinsFont,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 4.sp,
+                    lineHeight = 70.sp
+
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = NotFilled,
+                    unfocusedContainerColor = NotFilled,
+                    focusedIndicatorColor = NotFilled,
+                    unfocusedIndicatorColor = Color.White
+                ),
+                modifier = Modifier
+                    .width(59.dp)
+                    .height(90.dp)
+                    .focusRequester(focusRequesters[index])
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused && index > 0 && otpValues[index - 1].isEmpty()) {
+                            focusRequesters[index - 1].requestFocus()
+                        }
+                    },
+                shape = RoundedCornerShape(10.dp)
+            )
+        }
     }
 }
 
 
 
+/*
 @Preview
 @Composable
-fun Preview() {
-    TextFieldRegisterLoginScreenWithEye()
-}
+fun PreviewOtpComponent() {
+    OtpComponent()
+}*/
