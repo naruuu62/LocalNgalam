@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             SplashScreenHandler()
             MainScreen(navController = navController)
+
         }
     }
 }

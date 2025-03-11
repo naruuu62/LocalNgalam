@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -72,5 +74,6 @@ dependencies {
     implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("androidx.navigation:navigation-compose:2.7.6")
     implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation("androidx.compose.material:material:1.8.0-beta01")
 
 }

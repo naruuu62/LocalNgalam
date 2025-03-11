@@ -19,8 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.localngalam.presentation.GreenButtonRegisterLogin
-import com.example.localngalam.presentation.TextFieldRegisterLoginScreen
+import com.example.localngalam.presentation.ui_component.GreenButtonRegisterLogin
+import com.example.localngalam.presentation.ui_component.TextFieldRegisterLoginScreen
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 

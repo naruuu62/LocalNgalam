@@ -20,26 +20,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.localngalam.R
 import com.example.localngalam.autentikasi
-import com.example.localngalam.presentation.GoogleSignUpButton
-import com.example.localngalam.presentation.GreenButtonRegisterLogin
-import com.example.localngalam.presentation.OrDivider
-import com.example.localngalam.presentation.TextFieldRegisterLoginScreen
+import com.example.localngalam.presentation.ui_component.GoogleSignUpButton
+import com.example.localngalam.presentation.ui_component.GreenButtonRegisterLogin
+import com.example.localngalam.presentation.ui_component.OrDivider
+import com.example.localngalam.presentation.ui_component.TextFieldRegisterLoginScreen
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.Warning
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 
 @Composable
-fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, authViewModel:  autentikasi = viewModel()) {
+fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, authViewModel: autentikasi = viewModel()) {
     var email by remember { mutableStateOf("") }
     var namaLengkap by remember { mutableStateOf("") }
     var noTelepon by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginState by authViewModel.loginState.collectAsState()
-    var isRegistWrong by remember {mutableStateOf(false)}
+    var isRegistWrong by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Box(modifier = modifier
@@ -151,7 +149,6 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-
                 GreenButtonRegisterLogin(
                     text = "Sign Up",
                     onClick = {
@@ -165,7 +162,6 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
                             } else {
                                 isRegistWrong = true
                             }
-                            /* DAFTAR AKUN */
                         }
                     }
                 )
@@ -203,12 +199,17 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
                         modifier = Modifier
                             .clickable {
                                 navController.navigate("login")
-                                // ke page Login
-
                             }
                     )
                 }
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun Preview() {
+    val navController = androidx.navigation.compose.rememberNavController()
+    RegisterScreen(navController = navController)
 }
