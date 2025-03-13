@@ -1,11 +1,12 @@
 package com.example.localngalam.presentation
 
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-<<<<<<<<< Temporary merge branch 1
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -14,32 +15,24 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-=========
-import androidx.compose.material3.*
->>>>>>>>> Temporary merge branch 2
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-<<<<<<<<< Temporary merge branch 1
 import androidx.compose.ui.focus.FocusDirection
-=========
-import androidx.compose.ui.focus.*
->>>>>>>>> Temporary merge branch 2
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-<<<<<<<<< Temporary merge branch 1
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
-=========
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
->>>>>>>>> Temporary merge branch 2
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.localngalam.R

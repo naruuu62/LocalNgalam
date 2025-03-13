@@ -43,7 +43,6 @@ fun Navbar(
             BadgedBox(
                 badge = {},
                 modifier = Modifier
-                    .clip(CircleShape)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
@@ -76,7 +75,8 @@ fun Navbar(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_navbar_home),
                     contentDescription = "Home Icon",
-                    tint = Color.Unspecified
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(50.dp)
                 )
             }
 
