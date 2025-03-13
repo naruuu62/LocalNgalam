@@ -3,7 +3,6 @@ package com.example.localngalam.presentation.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-//<<<<<<< dirga
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,9 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-//=======
-import androidx.compose.foundation.layout.*
-//>>>>>>> main
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -176,11 +172,7 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  aut
                             } else {
                                 isPasswordWrong = true
                             }
-//<<<<<<< dirga
                         }
-//=======
-                    }
-//>>>>>>> main
                     }
                 )
 
@@ -219,10 +211,6 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  aut
                             .clickable {
                                 // ke page register
                                 navController.navigate("register")
-//<<<<<<< dirga
-//=======
-
-//>>>>>>> main
                             }
                     )
                 }

@@ -1,4 +1,4 @@
-package com.example.localngalam.presentation.home
+package com.example.localngalam.presentation.profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,13 +12,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.localngalam.presentation.ui_component.Navbar
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController) {
     Scaffold(
         bottomBar = {
             Navbar(
@@ -55,11 +54,10 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun PreviewHomeScreen() {
-    val navController = rememberNavController()
-    HomeScreen(navController)
+private fun Preview() {
+    val navController = androidx.navigation.compose.rememberNavController()
+    ProfileScreen(navController = navController)
 }
-
 

@@ -42,20 +42,12 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
     var isRegistWrong by remember {mutableStateOf(false)}
     val focusManager = LocalFocusManager.current
 
-//<<<<<<< dirga
     Box(modifier = modifier
         .fillMaxSize()
         .pointerInput(Unit) {
             detectTapGestures(onTap = {
                 focusManager.clearFocus(force = true)
             })
-//=======
-    Box(modifier = modifier.fillMaxSize()
-        .pointerInput(Unit){
-detectTapGestures(onTap = {
-focusManager.clearFocus(force = true)
-})
-//>>>>>>> main
         }) {
 
         Image(
