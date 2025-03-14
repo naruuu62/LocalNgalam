@@ -1,14 +1,23 @@
-package com.example.localngalam.presentation
+package com.example.localngalam.presentation.ui_component
 
+
+import android.R.attr.onClick
+import android.R.attr.text
+import android.os.Trace.isEnabled
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CheckboxDefaults.colors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,14 +28,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -37,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.localngalam.R
 import com.example.localngalam.presentation.ui.theme.*
+import com.google.firebase.annotations.concurrent.Background
 
 @Composable
 fun TextFieldRegisterLoginScreen(
@@ -50,7 +61,7 @@ fun TextFieldRegisterLoginScreen(
         value = value,
         onValueChange = onValueChange,
         keyboardOptions = KeyboardOptions(
-        imeAction = ImeAction.Next
+            imeAction = ImeAction.Next
         ),
         keyboardActions = KeyboardActions(
             onNext = {
@@ -108,10 +119,10 @@ fun TextFieldRegisterLoginScreenWithEye(
         value = value,
         onValueChange = onValueChange,
         keyboardOptions = KeyboardOptions(
-imeAction = ImeAction.Next
+            imeAction = ImeAction.Next
         ),
         keyboardActions = KeyboardActions(
-onNext = {focusManager.moveFocus(FocusDirection.Down)}
+            onNext = {focusManager.moveFocus(FocusDirection.Down)}
         ),
         placeholder = {
             Text(
@@ -333,11 +344,201 @@ fun OtpComponent(
     }
 }
 
+@Composable
+fun BackButton(
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .shadow(20.dp, CircleShape)
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(Color.White)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_back_button),
+            contentDescription = "Back Icon",
+            tint = Color.Unspecified,
+            modifier = modifier
+                .size(24.dp)
+        )
+    }
+}
+
+@Composable
+fun TextFieldCreatePlan(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholderText: String,
+    modifier: Modifier = Modifier
+) { val focusManager = LocalFocusManager.current
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Next
+        ),
+        keyboardActions = KeyboardActions(
+            onNext = {
+                focusManager.moveFocus(FocusDirection.Down)
+            }
+        ),
+        placeholder = {
+            Text(
+                text = placeholderText,
+                color = NotFilledText,
+                fontSize = 15.sp,
+                fontFamily = poppinsFont,
+                fontWeight = FontWeight.Light
+            )
+        },
+        singleLine = true,
+        shape = RoundedCornerShape(17.dp),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            focusedIndicatorColor = Color.White,
+            unfocusedIndicatorColor = Color.White
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(54.dp)
+            .border(
+                width = 1.dp, color = Color.Black, shape = RoundedCornerShape(size = 16.dp)
+            )
+    )
+}
+
+@Composable
+fun ButtonPrevCreatePlan(
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .width(93.dp)
+            .height(31.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(Green2)
+            .clickable { onClick() }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_back_createplan),
+                contentDescription = "Back Icon",
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Back",
+                fontSize = 12.sp,
+                fontFamily = poppinsFont,
+                fontWeight = FontWeight.Normal,
+                color = Blue3,
+                modifier = Modifier
+            )
+        }
+    }
+}
+
+@Composable
+fun ButtonNextCreatePlan(
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    Box(
+        modifier = modifier
+            .width(93.dp)
+            .height(31.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(if (enabled) Green2 else Color.LightGray)
+            .clickable(enabled = enabled) { onClick() }, // Disable klik jika tidak aktif
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = Modifier.width(29.dp))
+
+            Text(
+                text = "Next",
+                fontSize = 12.sp,
+                fontFamily = poppinsFont,
+                fontWeight = FontWeight.Normal,
+                color = if (enabled) Blue3 else Color.Gray // Warna berubah sesuai enabled
+            )
+
+            Spacer(modifier = Modifier.width(11.dp))
+
+            Icon(
+                painter = painterResource(id = R.drawable.ic_next_createplan),
+                contentDescription = "Next Icon",
+                tint = if (enabled) Color.Unspecified else Color.Gray, // Warna berubah sesuai enabled
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ButtonTypeTripPlan(
+    text: String,
+    iconResId: Int,
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    Box(
+        modifier = modifier
+            .width(149.dp)
+            .height(66.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color.White)
+            .clickable { if (enabled) onClick() }, // Hanya bisa diklik jika enabled
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painter = painterResource(id = iconResId),
+                contentDescription = "Plan Icon",
+                tint = if (enabled) Color.Unspecified else Color.Gray, // Warna berubah sesuai enabled
+                modifier = Modifier.size(20.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp)) // Jarak antara ikon dan teks
+
+            Text(
+                text = text,
+                fontSize = 12.sp,
+                fontFamily = poppinsFont,
+                fontWeight = FontWeight.Normal,
+                color = if (enabled) Blue3 else Color.Gray // Warna berubah sesuai enabled
+            )
+        }
+    }
+}
 
 
-/*
+
 @Preview
 @Composable
-fun PreviewOtpComponent() {
-    OtpComponent()
-}*/
+fun Preview() {
+    ButtonTypeTripPlan(
+        text = "Solo Trip",
+        iconResId = R.drawable.ic_close_eye,
+        onClick = { /* Aksi ketika tombol diklik */ }
+    )
+}
