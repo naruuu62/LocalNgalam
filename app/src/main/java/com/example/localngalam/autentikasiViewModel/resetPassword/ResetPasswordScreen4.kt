@@ -21,11 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.localngalam.BackEnd.autentikasi
-import com.example.localngalam.presentation.GreenButtonRegisterLogin
-import com.example.localngalam.presentation.TextFieldRegisterLoginScreenWithEye
+import com.example.localngalam.autentikasiViewModel.autentikasi
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.poppinsFont
+import com.example.localngalam.presentation.ui_component.GreenButtonRegisterLogin
+import com.example.localngalam.presentation.ui_component.TextFieldRegisterLoginScreenWithEye
 
 @Composable
 fun ResetPasswordScreen4(navController: NavController, modifier: Modifier = Modifier, authViewModel: autentikasi = viewModel()) {
