@@ -13,7 +13,20 @@
           "package_name": "com.example.localngalam"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "497053976903-iuc4ireb7aurjheokh2d170h711c3ptd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.localngalam",
+            "certificate_hash": "72f992d4a29fc90c1ae27a85aacad9e8ebb2fd35"
+          }
+        },
+        {
+          "client_id": "497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCdwfQN08PYImJdI3bdRuB8ntCNYxXXCWg"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -32,7 +50,20 @@
           "package_name": "com.example.sosmedfinal"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "497053976903-oq42ipsjii69keaguo25cemagd58ii3g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sosmedfinal",
+            "certificate_hash": "72f992d4a29fc90c1ae27a85aacad9e8ebb2fd35"
+          }
+        },
+        {
+          "client_id": "497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCdwfQN08PYImJdI3bdRuB8ntCNYxXXCWg"
@@ -40,7 +71,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -19,13 +19,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.localngalam.BackEnd.autentikasi
 import com.example.localngalam.presentation.GreenButtonRegisterLogin
 import com.example.localngalam.presentation.TextFieldRegisterLoginScreenWithEye
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 
 @Composable
-fun ResetPasswordScreen4(modifier: Modifier = Modifier) {
+fun ResetPasswordScreen4(navController: NavController, modifier: Modifier = Modifier, authViewModel: autentikasi = viewModel()) {
     var oldPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
 
@@ -80,6 +83,7 @@ fun ResetPasswordScreen4(modifier: Modifier = Modifier) {
             text = "Konfirmasi",
             isEnabled = oldPassword.isNotEmpty() && newPassword.isNotEmpty() && oldPassword == newPassword,
             onClick = {
+                navController.navigate("login")
                 // UBAH PASSWORD LAMA MENJADI PASWORD BARU
             }
         )
@@ -91,8 +95,8 @@ fun ResetPasswordScreen4(modifier: Modifier = Modifier) {
 }
 
 
-@Preview (device = "spec:width=412dp,height=917dp",showSystemUi = false)
-@Composable
-private fun Screen() {
-    ResetPasswordScreen4()
-}
+//@Preview (device = "spec:width=412dp,height=917dp",showSystemUi = false)
+//@Composable
+//private fun Screen() {
+  //  ResetPasswordScreen4()
+//}

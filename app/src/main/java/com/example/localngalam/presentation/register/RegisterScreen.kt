@@ -1,5 +1,8 @@
 package com.example.localngalam.presentation.register
 
+import android.app.Activity.RESULT_OK
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -11,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,7 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.localngalam.R
-import com.example.localngalam.autentikasi
+import com.example.localngalam.BackEnd.autentikasi
 import com.example.localngalam.presentation.GoogleSignUpButton
 import com.example.localngalam.presentation.GreenButtonRegisterLogin
 import com.example.localngalam.presentation.OrDivider
@@ -31,6 +35,9 @@ import com.example.localngalam.presentation.TextFieldRegisterLoginScreen
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.Warning
 import com.example.localngalam.presentation.ui.theme.poppinsFont
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 
 @Composable
 fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, authViewModel:  autentikasi = viewModel()) {
@@ -39,15 +46,40 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
     var noTelepon by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val loginState by authViewModel.loginState.collectAsState()
+    val context = LocalContext.current
     var isRegistWrong by remember {mutableStateOf(false)}
     val focusManager = LocalFocusManager.current
 
-    Box(modifier = modifier
-        .fillMaxSize()
-        .pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                focusManager.clearFocus(force = true)
-            })
+    val gso = remember {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+    }
+    val GoogleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                account?.let {
+                    authViewModel.signInWithGoogle(it.idToken!!)
+                }
+            } catch (e: ApiException) {
+                println("Google sign in failed: ${e.statusCode}")
+            }
+        }
+    }
+
+    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
+
+//=======
+    Box(modifier = modifier.fillMaxSize()
+        .pointerInput(Unit){
+        detectTapGestures(onTap = {
+        focusManager.clearFocus(force = true)
+        })
+//>>>>>>> main
         }) {
 
         Image(
@@ -153,22 +185,26 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
 
 
                 GreenButtonRegisterLogin(
+                    isEnabled = email.isNotEmpty(),
                     text = "Sign Up",
                     onClick = {
                         if (password.isEmpty() || email.isEmpty() || password.length < 8) {
                             isRegistWrong = true
                         } else {
-                            authViewModel.register(email, password)
-
-                            if (loginState == true) {
-                                navController.navigate("home")
-                            } else {
-                                isRegistWrong = true
-                            }
+                            authViewModel.register(email, password, namaLengkap, noTelepon)
                             /* DAFTAR AKUN */
                         }
                     }
                 )
+
+                LaunchedEffect(loginState) {
+                    if (loginState == false) {
+                        isRegistWrong = true
+                        navController.navigate("home")
+                    } else if(loginState == true) {
+                        navController.navigate("home")
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -178,9 +214,19 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
 
                 GoogleSignUpButton(
                     onClick = {
-                        /* SIGN UP gugel */
+                        val signInIntent = googleSignInClient.signInIntent
+                        launcher.launch(signInIntent)
+                        /* login gugel */
                     }
                 )
+
+                LaunchedEffect(loginState) {
+                    if (loginState == true) {
+                        navController.navigate("home")
+                    } else if (loginState == false) {
+                        isRegistWrong = true
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
