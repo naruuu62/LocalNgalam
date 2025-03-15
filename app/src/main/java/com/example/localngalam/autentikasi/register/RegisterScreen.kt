@@ -19,15 +19,12 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.localngalam.R
-import com.example.localngalam.autentikasiViewModel.autentikasi
+import com.example.localngalam.autentikasi.autentikasiViewModel
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.Warning
 import com.example.localngalam.presentation.ui.theme.poppinsFont
@@ -40,7 +37,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 @Composable
-fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, authViewModel:  autentikasi = viewModel()) {
+fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, authViewModel:  autentikasiViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
     var namaLengkap by remember { mutableStateOf("") }
     var noTelepon by remember { mutableStateOf("") }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,25 +17,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.localngalam.autentikasiViewModel.autentikasi
+import com.example.localngalam.autentikasi.autentikasiViewModel
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 import com.example.localngalam.presentation.ui_component.GreenButtonRegisterLogin
 import com.example.localngalam.presentation.ui_component.TextFieldRegisterLoginScreen
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @Composable
-fun ResetPasswordScreen1(navController: NavController, modifier: Modifier = Modifier, authViewModel: autentikasi = viewModel()) {
+fun ResetPasswordScreen1(navController: NavController, modifier: Modifier = Modifier, authViewModel: autentikasiViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
     val auth = FirebaseAuth.getInstance()
     val user = auth.currentUser

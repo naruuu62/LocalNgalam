@@ -16,19 +16,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.localngalam.autentikasiViewModel.autentikasi
+import com.example.localngalam.autentikasi.autentikasiViewModel
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 import com.example.localngalam.presentation.ui_component.GreenButtonRegisterLogin
 import com.example.localngalam.presentation.ui_component.TextFieldRegisterLoginScreenWithEye
 
 @Composable
-fun ResetPasswordScreen4(navController: NavController, modifier: Modifier = Modifier, authViewModel: autentikasi = viewModel()) {
+fun ResetPasswordScreen4(navController: NavController, modifier: Modifier = Modifier, authViewModel: autentikasiViewModel = viewModel()) {
     var oldPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
 

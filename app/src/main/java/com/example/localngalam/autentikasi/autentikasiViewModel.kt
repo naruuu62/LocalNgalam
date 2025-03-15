@@ -1,11 +1,11 @@
-package com.example.localngalam.autentikasiViewModel
+package com.example.localngalam.autentikasi
 
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.localngalam.data.UserData
-import com.example.localngalam.data.saveUserDataFireStore
+import com.example.localngalam.model.UserData
+import com.example.localngalam.model.saveUserDataFireStore
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -15,16 +15,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class autentikasi : ViewModel() {
+class autentikasiViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val lloginState = MutableStateFlow<Boolean?>(null)
     val loginState: StateFlow<Boolean?> get() = lloginState
-    private lateinit var googleSignInClient: GoogleSignInClient
-
-
-
-    private var savedOobCode: String? = null // Untuk menyimpan oobCode
-
+    lateinit var googleSignInClient: GoogleSignInClient
 
     fun initGoogleSignInClient(context: Context) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -122,7 +117,15 @@ class autentikasi : ViewModel() {
 
     fun signOut() {
         auth.signOut()
-        googleSignInClient.signOut()
-        lloginState.value = false
+        if(::googleSignInClient.isInitialized){
+        googleSignInClient.signOut().addOnCompleteListener {
+            lloginState.value = false
+            Log.d("Autentikasi", "Logout berhasil")
+        }
+            }
+        else{
+            Log.e("Autentikasi", "Google Sign-In client belum diinisialisasi")
+        }
+        }
+
     }
-}

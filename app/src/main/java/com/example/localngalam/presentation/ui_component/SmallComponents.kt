@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -530,6 +531,58 @@ fun ButtonTypeTripPlan(
         }
     }
 }
+
+@Composable
+fun SettingList(onItemClick: (String) -> Unit){
+    listOf(
+        R.drawable.ic_notification to "Notifikasi",
+        R.drawable.ic_bucket_list to "Bucket List",
+        R.drawable.ic_history_plan to "History Trip Plan",
+        R.drawable.ic_posting to "Posting",
+        R.drawable.ic_about to "Tentang",
+        R.drawable.ic_languange to "Bahasa",
+        R.drawable.ic_logout to "logout" //ruteNavController sob
+    ).forEach { (icon, route) ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onItemClick(route) }
+                .padding(vertical = 15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = route,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = route, fontSize = 16.sp, fontWeight = FontWeight.Normal, modifier = Modifier.width(270.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_next_createplan),
+                contentDescription = "Arrow Right",
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+
+}
+
+@Composable
+fun settingIcon(onItemClick: (String) -> Unit){
+    Row(modifier = Modifier.padding(vertical = 12.dp)) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_setting__1_),
+            contentDescription = "Setting",
+            modifier = Modifier
+                .size(24.dp)
+        )
+    }
+}
+
+
+
+
+
 
 
 

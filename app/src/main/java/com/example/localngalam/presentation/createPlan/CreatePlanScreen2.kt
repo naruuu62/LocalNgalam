@@ -12,18 +12,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.poppinsFont
-import com.example.localngalam.presentation.ui_component.BackButton
-import com.example.localngalam.presentation.ui_component.Calendar
-import com.example.localngalam.presentation.ui_component.TextFieldCreatePlan
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.draw.shadow
+import androidx.navigation.compose.rememberNavController
 import com.example.localngalam.presentation.ui.theme.Blue2
 import com.example.localngalam.presentation.ui.theme.Blue3
-import com.example.localngalam.presentation.ui_component.ButtonNextCreatePlan
-import com.example.localngalam.presentation.ui_component.ButtonPrevCreatePlan
 import com.example.localngalam.presentation.ui_component.Navbar2
 import java.time.LocalDate
 
@@ -109,7 +103,7 @@ fun CreatePlanScreen2(navController: NavController) {
 @Preview(showBackground = false, device = "spec:width=412dp,height=917dp")
 @Composable
 private fun Preview() {
-    val navController = androidx.navigation.compose.rememberNavController()
+    val navController = rememberNavController()
     CreatePlanScreen2(navController = navController)
 }
 

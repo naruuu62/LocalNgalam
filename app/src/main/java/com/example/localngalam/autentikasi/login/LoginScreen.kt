@@ -1,7 +1,6 @@
 package com.example.localngalam.presentation.login
 
 import android.app.Activity.RESULT_OK
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 //=======
-import androidx.compose.foundation.layout.*
 //>>>>>>> main
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.localngalam.R
-import com.example.localngalam.autentikasiViewModel.autentikasi
+import com.example.localngalam.autentikasi.autentikasiViewModel
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.Warning
 import com.example.localngalam.presentation.ui.theme.poppinsFont
@@ -56,13 +54,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 @Composable
-fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  authViewModel: autentikasi = viewModel()) {
+fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  authViewModel: autentikasiViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordWrong by remember { mutableStateOf(false) }
     val loginState by authViewModel.loginState.collectAsState()
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(Unit) {
+        authViewModel.initGoogleSignInClient(context)
+    }
+
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com")
@@ -225,7 +228,7 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  aut
 
                 GoogleSignUpButton(
                     onClick = {
-                        val signInIntent = googleSignInClient.signInIntent
+                        val signInIntent = authViewModel.googleSignInClient.signInIntent
                         launcher.launch(signInIntent)
                         /* login gugel */
                     }
