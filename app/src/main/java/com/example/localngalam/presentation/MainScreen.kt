@@ -8,7 +8,9 @@ import com.example.localngalam.presentation.home.HomeScreen
 import androidx.navigation.compose.composable
 import com.example.localngalam.presentation.history.HistoryScreen
 import com.example.localngalam.presentation.profile.ProfileScreen
-import com.example.localngalam.presentation.createPlan.CreatePlanScreen1
+import com.example.localngalam.createPlan.CreatePlanScreen1
+import com.example.localngalam.createPlan.CreatePlanScreen2
+import com.example.localngalam.createPlan.CreatePlanScreen3
 import com.example.localngalam.presentation.login.LoginScreen
 import com.example.localngalam.presentation.register.RegisterScreen
 import com.example.localngalam.presentation.resetPassword.ResetPasswordScreen1
@@ -30,5 +32,7 @@ fun MainScreen(navController: NavHostController) {
         composable("resetpassword") { ResetPasswordScreen4(navController) }
         composable("tesimport") { FirestoreDataScreen(navController) }
         composable("add_plan") { CreatePlanScreen1(navController) }
+        composable("add_plan_type") { CreatePlanScreen2(navController) }
+        composable("add_plan_route") { CreatePlanScreen3(navController) }
     }
 }

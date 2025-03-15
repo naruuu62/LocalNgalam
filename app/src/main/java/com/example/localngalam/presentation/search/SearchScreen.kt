@@ -1,24 +1,28 @@
 package com.example.localngalam.presentation.search
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.localngalam.R
 import com.example.localngalam.presentation.ui_component.Navbar
-import com.example.localngalam.presentation.history.HistoryScreen
-import com.example.localngalam.presentation.ui.theme.Blue
-import com.example.localngalam.presentation.ui.theme.poppinsFont
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController) {
+    var searchText by remember { mutableStateOf("") }
+    var active by remember { mutableStateOf(false) }
+
     Scaffold(
         bottomBar = {
             Navbar(
@@ -35,21 +39,45 @@ fun SearchScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            SearchBar(
+                modifier = Modifier.fillMaxWidth(),
+                query = searchText,
+                onQueryChange = { searchText = it },
+                onSearch = { active = false },
+                active = active,
+                onActiveChange = { active = it },
+                placeholder = {"Pergi kemana hari ini?"},
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_solo_trip),
+                        contentDescription ="search icon"
+                    )
+                },
+                trailingIcon = {
+                        if (active) {
+                            Icon(
+                                modifier = Modifier.clickable {
+                                    if (searchText.isNotEmpty()) {
+                                        searchText = ""
+                                    } else {
+                                        active = false
+                                    }
+                                },
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "close icon"
+                            )
+                        }
+                }
+            )
+             {
+                // Tambahkan hasil pencarian di sini jika ada
+            }
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp)
             ) {
-                item {
-                    Text(
-                        text = "KOSONGAN DULU!",
-                        fontSize = 20.sp,
-                        fontFamily = poppinsFont,
-                        fontWeight = FontWeight.Bold,
-                        color = Blue,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                // Tempatkan item hasil pencarian di sini jika ada
             }
         }
     }
@@ -57,8 +85,7 @@ fun SearchScreen(navController: NavController) {
 
 @Preview(showBackground = true)
 @Composable
-private fun Preview() {
-    val navController = androidx.navigation.compose.rememberNavController()
-    HistoryScreen(navController = navController)
+private fun PreviewSearchScreen() {
+    val navController = rememberNavController()
+    SearchScreen(navController = navController)
 }
-

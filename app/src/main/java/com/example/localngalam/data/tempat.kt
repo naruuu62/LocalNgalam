@@ -91,7 +91,6 @@ fun FirestoreDataScreen(navController: NavController) {
     }
 }
 
-// Composable untuk setiap item
 @Composable
 fun TempatCard(tempat: Tempat) {
     Card(

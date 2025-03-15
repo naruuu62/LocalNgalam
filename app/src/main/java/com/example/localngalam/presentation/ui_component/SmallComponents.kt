@@ -1,9 +1,5 @@
 package com.example.localngalam.presentation.ui_component
 
-
-import android.R.attr.onClick
-import android.R.attr.text
-import android.os.Trace.isEnabled
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -17,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CheckboxDefaults.colors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -47,7 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.localngalam.R
 import com.example.localngalam.presentation.ui.theme.*
-import com.google.firebase.annotations.concurrent.Background
+import android.os.Handler
+import android.os.Looper
 
 @Composable
 fun TextFieldRegisterLoginScreen(
@@ -494,51 +489,52 @@ fun ButtonNextCreatePlan(
 fun ButtonTypeTripPlan(
     text: String,
     iconResId: Int,
-    onClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
+            .shadow(4.dp, shape = RoundedCornerShape(10.dp))
             .width(149.dp)
             .height(66.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(Color.White)
-            .clickable { if (enabled) onClick() }, // Hanya bisa diklik jika enabled
+            .background(if (isSelected) Blue3 else Color.White)
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
         ) {
             Icon(
                 painter = painterResource(id = iconResId),
                 contentDescription = "Plan Icon",
-                tint = if (enabled) Color.Unspecified else Color.Gray, // Warna berubah sesuai enabled
+                tint = if (isSelected) Color.White else Color.Black,
                 modifier = Modifier.size(20.dp)
             )
 
-            Spacer(modifier = Modifier.width(8.dp)) // Jarak antara ikon dan teks
+            Spacer(modifier = Modifier.width(8.dp))
 
             Text(
                 text = text,
                 fontSize = 12.sp,
-                fontFamily = poppinsFont,
                 fontWeight = FontWeight.Normal,
-                color = if (enabled) Blue3 else Color.Gray // Warna berubah sesuai enabled
+                color = if (isSelected) Color.White else Color.Black,
+                textAlign = TextAlign.Center
             )
         }
     }
 }
 
-
-
 @Preview
 @Composable
 fun Preview() {
     ButtonTypeTripPlan(
-        text = "Solo Trip",
-        iconResId = R.drawable.ic_close_eye,
-        onClick = { /* Aksi ketika tombol diklik */ }
+        text = "Perjalanan Solo",
+        iconResId = R.drawable.ic_solo_trip,
+        onClick = { },
+        isSelected = false
     )
 }
