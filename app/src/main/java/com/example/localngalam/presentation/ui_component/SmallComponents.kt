@@ -1,6 +1,5 @@
 package com.example.localngalam.presentation.ui_component
 
-
 import android.R.attr.onClick
 import android.R.attr.text
 import android.os.Trace.isEnabled
@@ -47,7 +46,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.localngalam.R
 import com.example.localngalam.presentation.ui.theme.*
+import android.os.Handler
+import android.os.Looper
 import com.google.firebase.annotations.concurrent.Background
+
 
 @Composable
 fun TextFieldRegisterLoginScreen(
@@ -494,6 +496,18 @@ fun ButtonNextCreatePlan(
 fun ButtonTypeTripPlan(
     text: String,
     iconResId: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .shadow(4.dp, shape = RoundedCornerShape(10.dp))
+            .width(149.dp)
+            .height(66.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(if (isSelected) Blue3 else Color.White)
+            .clickable { onClick() },
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     enabled: Boolean = true
@@ -504,39 +518,58 @@ fun ButtonTypeTripPlan(
             .height(66.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(Color.White)
-            .clickable { if (enabled) onClick() }, // Hanya bisa diklik jika enabled
+            .clickable { if (enabled) onClick() }, 
         contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
             horizontalArrangement = Arrangement.Center
         ) {
             Icon(
                 painter = painterResource(id = iconResId),
                 contentDescription = "Plan Icon",
-                tint = if (enabled) Color.Unspecified else Color.Gray, // Warna berubah sesuai enabled
+                tint = if (isSelected) Color.White else Color.Black,
+                modifier = Modifier.size(20.dp)
+            )
+                tint = if (enabled) Color.Unspecified else Color.Gray, 
                 modifier = Modifier.size(20.dp)
             )
 
-            Spacer(modifier = Modifier.width(8.dp)) // Jarak antara ikon dan teks
+            Spacer(modifier = Modifier.width(8.dp)) 
 
             Text(
                 text = text,
                 fontSize = 12.sp,
                 fontFamily = poppinsFont,
                 fontWeight = FontWeight.Normal,
-                color = if (enabled) Blue3 else Color.Gray // Warna berubah sesuai enabled
+                color = if (enabled) Blue3 else Color.Gray 
+            )
+        }
+    }
+}
+         Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                text = text,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                color = if (isSelected) Color.White else Color.Black,
+                textAlign = TextAlign.Center
             )
         }
     }
 }
 
-
-
 @Preview
 @Composable
 fun Preview() {
     ButtonTypeTripPlan(
+        text = "Perjalanan Solo",
+        iconResId = R.drawable.ic_solo_trip,
+        onClick = { },
+        isSelected = false
         text = "Solo Trip",
         iconResId = R.drawable.ic_close_eye,
         onClick = { /* Aksi ketika tombol diklik */ }

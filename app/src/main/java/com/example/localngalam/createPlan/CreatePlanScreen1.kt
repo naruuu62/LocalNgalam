@@ -1,3 +1,4 @@
+package com.example.localngalam.createPlan
 package com.example.localngalam.presentation.createPlan
 
 import androidx.compose.foundation.background
@@ -13,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.localngalam.presentation.ui.theme.Blue
+
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 import com.example.localngalam.presentation.ui_component.BackButton
 import com.example.localngalam.presentation.ui_component.Calendar
@@ -26,6 +28,9 @@ import com.example.localngalam.presentation.ui_component.ButtonNextCreatePlan
 import com.example.localngalam.presentation.ui_component.ButtonPrevCreatePlan
 import com.example.localngalam.presentation.ui_component.Navbar2
 import java.time.LocalDate
+
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun CreatePlanScreen1(navController: NavController) {
@@ -50,6 +55,8 @@ fun CreatePlanScreen1(navController: NavController) {
                 .padding(paddingValues)
                 .fillMaxSize()
                 .background(Color.White)
+
+                .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(56.dp))
 
@@ -138,6 +145,21 @@ fun CreatePlanScreen1(navController: NavController) {
                 ButtonPrevCreatePlan(
                     onClick = { navController.popBackStack()}
                 )
+
+                 Spacer(modifier = Modifier.weight(1f))
+               ButtonNextCreatePlan(
+                    onClick = {navController.navigate("add_plan_type")},
+                    enabled = planName.isNotBlank() && startDate != null && endDate != null
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+    }
+}
+
+
+
                 Spacer(modifier = Modifier.weight(1f))
                 ButtonNextCreatePlan(
                     onClick = {},
