@@ -33,7 +33,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -532,6 +531,18 @@ fun ButtonTypeTripPlan(
     }
 }
 
+
+
+@Preview
+@Composable
+fun Preview() {
+    ButtonTypeTripPlan(
+        text = "Solo Trip",
+        iconResId = R.drawable.ic_close_eye,
+        onClick = { /* Aksi ketika tombol diklik */ }
+    )
+}
+
 @Composable
 fun SettingList(onItemClick: (String) -> Unit){
     listOf(
@@ -580,18 +591,3 @@ fun settingIcon(onItemClick: (String) -> Unit){
 }
 
 
-
-
-
-
-
-
-@Preview
-@Composable
-fun Preview() {
-    ButtonTypeTripPlan(
-        text = "Solo Trip",
-        iconResId = R.drawable.ic_close_eye,
-        onClick = { /* Aksi ketika tombol diklik */ }
-    )
-}
