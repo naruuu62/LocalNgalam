@@ -1,4 +1,5 @@
 package com.example.localngalam.createPlan
+package com.example.localngalam.presentation.createPlan
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.localngalam.presentation.ui.theme.Blue
+
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 import com.example.localngalam.presentation.ui_component.BackButton
 import com.example.localngalam.presentation.ui_component.Calendar
@@ -25,6 +28,7 @@ import com.example.localngalam.presentation.ui_component.ButtonNextCreatePlan
 import com.example.localngalam.presentation.ui_component.ButtonPrevCreatePlan
 import com.example.localngalam.presentation.ui_component.Navbar2
 import java.time.LocalDate
+
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 
@@ -51,6 +55,7 @@ fun CreatePlanScreen1(navController: NavController) {
                 .padding(paddingValues)
                 .fillMaxSize()
                 .background(Color.White)
+
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(56.dp))
@@ -140,6 +145,7 @@ fun CreatePlanScreen1(navController: NavController) {
                 ButtonPrevCreatePlan(
                     onClick = { navController.popBackStack()}
                 )
+
                  Spacer(modifier = Modifier.weight(1f))
                ButtonNextCreatePlan(
                     onClick = {navController.navigate("add_plan_type")},
@@ -152,6 +158,17 @@ fun CreatePlanScreen1(navController: NavController) {
     }
 }
 
+
+
+                Spacer(modifier = Modifier.weight(1f))
+                ButtonNextCreatePlan(
+                    onClick = {},
+                    enabled = planName.isNotBlank() && startDate != null && endDate != null
+                )
+            }
+        }
+    }
+}
 
 @Preview(showBackground = false, device = "spec:width=412dp,height=917dp")
 @Composable

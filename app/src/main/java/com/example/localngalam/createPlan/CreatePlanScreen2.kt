@@ -3,6 +3,8 @@ package com.example.localngalam.createPlan
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -11,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 import androidx.compose.runtime.Composable
 import com.example.localngalam.R
@@ -28,6 +31,27 @@ import androidx.compose.ui.res.painterResource
 fun CreatePlanScreen2(navController: NavController) {
     var selectedTripType by remember { mutableStateOf<String?>(null) }
     //VARIABLE JENIS PERJALANAM /solo /friendship /romance /family
+import com.example.localngalam.presentation.ui.theme.Blue
+import com.example.localngalam.presentation.ui.theme.poppinsFont
+import com.example.localngalam.presentation.ui_component.BackButton
+import com.example.localngalam.presentation.ui_component.Calendar
+import com.example.localngalam.presentation.ui_component.TextFieldCreatePlan
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.shadow
+import com.example.localngalam.presentation.ui.theme.Blue2
+import com.example.localngalam.presentation.ui.theme.Blue3
+import com.example.localngalam.presentation.ui_component.ButtonNextCreatePlan
+import com.example.localngalam.presentation.ui_component.ButtonPrevCreatePlan
+import com.example.localngalam.presentation.ui_component.Navbar2
+import java.time.LocalDate
+
+@Composable
+fun CreatePlanScreen2(navController: NavController) {
+    var startDate by remember { mutableStateOf<LocalDate?>(null) }
+    var endDate by remember { mutableStateOf<LocalDate?>(null) }
+    var daysCount by remember { mutableStateOf<Long?>(null) }
+    var planName by remember { mutableStateOf("") }
 
     Scaffold(
         bottomBar = {
@@ -49,7 +73,9 @@ fun CreatePlanScreen2(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(61.dp))
 
+
             Text(
+                Text(
                 text = "Malang Trip",
                 fontSize = 16.sp,
                 fontFamily = poppinsFont,
@@ -91,6 +117,10 @@ fun CreatePlanScreen2(navController: NavController) {
             Row(modifier = Modifier.width(295.dp)) {
                 Text(
                     text = "Pilih salah satu.",
+                )
+
+                Text(
+                    text = "2 of 4",
                     fontSize = 12.sp,
                     lineHeight = 24.sp,
                     fontFamily = poppinsFont,
@@ -98,6 +128,7 @@ fun CreatePlanScreen2(navController: NavController) {
                     color = Color(0xFFCCCCCC),
                     letterSpacing = 0.5.sp,
                 )
+
             }
 
             Spacer(modifier = Modifier.height(25.dp))
@@ -151,6 +182,35 @@ fun CreatePlanScreen2(navController: NavController) {
                     enabled = selectedTripType != null
                 )
             }
+
+
+            Text(
+                text = "Jenis perjalanan apa yang Anda Rencanakan?",
+                    fontSize = 12.sp,
+                    lineHeight = 24.sp,
+                    fontFamily = poppinsFont,
+                    fontWeight = FontWeight.Normal,
+                    color = Blue3,
+                    letterSpacing = 0.5.sp,
+                )
+
+            Row (modifier = Modifier.width(295.dp)
+            ){
+
+                Text(
+                    text = "Pilih salah satu.",
+                        fontSize = 12.sp,
+                        lineHeight = 24.sp,
+                        fontFamily = poppinsFont,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFFCCCCCC),
+                        letterSpacing = 0.5.sp,
+                    )
+
+            }
+
+
+
         }
     }
 }

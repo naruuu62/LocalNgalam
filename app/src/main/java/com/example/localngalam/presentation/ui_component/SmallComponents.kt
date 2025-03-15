@@ -1,5 +1,8 @@
 package com.example.localngalam.presentation.ui_component
 
+import android.R.attr.onClick
+import android.R.attr.text
+import android.os.Trace.isEnabled
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -13,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CheckboxDefaults.colors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -43,6 +48,8 @@ import com.example.localngalam.R
 import com.example.localngalam.presentation.ui.theme.*
 import android.os.Handler
 import android.os.Looper
+import com.google.firebase.annotations.concurrent.Background
+
 
 @Composable
 fun TextFieldRegisterLoginScreen(
@@ -501,12 +508,24 @@ fun ButtonTypeTripPlan(
             .clip(RoundedCornerShape(10.dp))
             .background(if (isSelected) Blue3 else Color.White)
             .clickable { onClick() },
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    Box(
+        modifier = modifier
+            .width(149.dp)
+            .height(66.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color.White)
+            .clickable { if (enabled) onClick() }, 
         contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
+            horizontalArrangement = Arrangement.Center
         ) {
             Icon(
                 painter = painterResource(id = iconResId),
@@ -514,8 +533,23 @@ fun ButtonTypeTripPlan(
                 tint = if (isSelected) Color.White else Color.Black,
                 modifier = Modifier.size(20.dp)
             )
+                tint = if (enabled) Color.Unspecified else Color.Gray, 
+                modifier = Modifier.size(20.dp)
+            )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(8.dp)) 
+
+            Text(
+                text = text,
+                fontSize = 12.sp,
+                fontFamily = poppinsFont,
+                fontWeight = FontWeight.Normal,
+                color = if (enabled) Blue3 else Color.Gray 
+            )
+        }
+    }
+}
+         Spacer(modifier = Modifier.width(8.dp))
 
             Text(
                 text = text,
@@ -536,5 +570,8 @@ fun Preview() {
         iconResId = R.drawable.ic_solo_trip,
         onClick = { },
         isSelected = false
+        text = "Solo Trip",
+        iconResId = R.drawable.ic_close_eye,
+        onClick = { /* Aksi ketika tombol diklik */ }
     )
 }
