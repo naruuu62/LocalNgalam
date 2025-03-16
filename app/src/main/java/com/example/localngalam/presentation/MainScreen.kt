@@ -3,15 +3,17 @@ package com.example.localngalam.presentation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.localngalam.presentation.home.HomeScreen
 import androidx.navigation.compose.composable
 import com.example.localngalam.presentation.history.HistoryScreen
 import com.example.localngalam.presentation.profile.ProfileScreen
-import com.example.localngalam.createPlan.CreatePlanScreen3
+
 import com.example.localngalam.presentation.createPlan.CreatePlanScreen1
 import com.example.localngalam.presentation.createPlan.CreatePlanScreen2
+import com.example.localngalam.presentation.createPlan.CreatePlanScreen3
 import com.example.localngalam.presentation.login.LoginScreen
 import com.example.localngalam.presentation.register.RegisterScreen
 import com.example.localngalam.presentation.resetPassword.ResetPasswordScreen1
@@ -35,8 +37,8 @@ fun MainScreen(navController: NavHostController) {
         composable("resetpassword") { ResetPasswordScreen4(navController) }
         composable("tesimport") { tempatScreen(navController) }
         composable("add_plan") { CreatePlanScreen1(navController) }
-        composable("add_plan_type") { CreatePlanScreen2(navController) }
-        composable("add_plan_route") { CreatePlanScreen3(navController) }
+        composable("create_plan_2") { CreatePlanScreen2(navController) }
+        composable("create_plan_3") { CreatePlanScreen3(navController)}
 
     }
 }

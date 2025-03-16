@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.shadow
 import androidx.navigation.compose.rememberNavController
+import com.example.localngalam.model.Perjalanan
+import com.example.localngalam.model.saveToFirestoreJadwal
 import com.example.localngalam.presentation.ui.theme.Blue2
 import com.example.localngalam.presentation.ui.theme.Blue3
 import com.example.localngalam.presentation.ui_component.ButtonNextCreatePlan
@@ -30,6 +32,9 @@ import com.example.localngalam.presentation.ui_component.ButtonPrevCreatePlan
 import com.example.localngalam.presentation.ui_component.Navbar2
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import planViewModel
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -152,6 +157,10 @@ fun CreatePlanScreen1(navController: NavController) {
                 Spacer(modifier = Modifier.weight(1f))
                 ButtonNextCreatePlan(
                     onClick = {
+                        val perjalanan = Perjalanan(namaPerjalanan = planName, tanggalBerangkat = startDate.toString(), tanggalSelesai = endDate.toString())
+                        saveToFirestoreJadwal(perjalanan)
+                        navController.navigate("create_plan_2")
+
                        // saveUserDataFireStore(planName, startDate, endDate)
                     },
                     enabled = planName.isNotBlank() && startDate != null && endDate != null
@@ -170,26 +179,6 @@ fun CreatePlanScreen1(navController: NavController) {
         return dates
     }
 
-
-    fun saveToFirestore(planName: String, JvmNamestartDate: LocalDate?, endDate: LocalDate?) {
-        if (startDate == null || endDate == null) {
-            Log.e("Firestore", "Tanggal tidak boleh kosong!")
-            return
-        }
-
-        val auth = FirebaseAuth.getInstance()
-        val user = auth.currentUser
-        val db = FirebaseFirestore.getInstance()
-        val perjalanan = hashMapOf(
-            "namaPerjalanan" to planName,  // Simpan nama perjalanan juga
-            "tanggalBerangkat" to startDate.toString(),
-            "tanggalSelesai" to endDate.toString(),
-            "idPengguna" to user?.uid,
-           // "selectedDates" to getDatesBetween(startDate, endDate).map { it.toString() }
-        )
-
-        db.collection("journeys").add(perjalanan)
-    }
 }
 
 

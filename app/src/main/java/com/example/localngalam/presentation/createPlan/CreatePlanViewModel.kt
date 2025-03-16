@@ -1,15 +1,17 @@
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 //filter data sob by category
 class planViewModel : ViewModel() {
     private val db = Firebase.firestore
-
 
     private val _tempatList = MutableStateFlow<List<Tempat>>(emptyList())
     val tempatList: StateFlow<List<Tempat>> get() = _tempatList
@@ -35,7 +37,8 @@ class planViewModel : ViewModel() {
                         open = queryDocumentSnapshot.getString("Open") ?: "",
                         phoneNumber = queryDocumentSnapshot.getString("Phone Number") ?: "",
                         priceRange = queryDocumentSnapshot.getLong("Price Range") ?: 0,
-                        tags = queryDocumentSnapshot.get("Tag") as? List<Long> ?: emptyList()
+                        tags = queryDocumentSnapshot.get("Tag") as? List<Long> ?: emptyList(),
+                        gambar = queryDocumentSnapshot.getString("gambar") ?: ""
                     )
                 } ?: emptyList()
                 _tempatList.value = tempatData
