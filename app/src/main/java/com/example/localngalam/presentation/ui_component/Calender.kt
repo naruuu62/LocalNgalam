@@ -1,5 +1,6 @@
 package com.example.localngalam.presentation.ui_component
 
+import android.R
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -29,8 +30,10 @@ import java.time.format.TextStyle
 import java.util.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import com.example.localngalam.presentation.ui.theme.Blue2
+import com.example.localngalam.presentation.ui.theme.Blue3
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -53,21 +56,26 @@ fun Calendar(
 
     Column(
         modifier = Modifier
+            .clip(RoundedCornerShape(size = 15.dp))
             .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(size = 15.dp))
+            .background(color = Blue3)
             .width(354.dp)
             .height(433.dp)
+            .clip(RoundedCornerShape(size = 15.dp))
     ) {
         val currentMonth = state.firstVisibleMonth.yearMonth
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+
         ) {
             Text(
                 text = "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${currentMonth.year}",
                 fontSize = 15.sp,
                 fontFamily = poppinsFont,
                 fontWeight = FontWeight.Bold,
+                color = Color.White,
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 20.dp, top = 20.dp, bottom = 20.dp)
@@ -85,7 +93,7 @@ fun Calendar(
                     },
                     enabled = currentMonth > YearMonth.now()
                 ) {
-                    Text("<", fontSize = 20.sp, fontWeight = Bold)
+                    Text("<", fontSize = 20.sp, fontWeight = Bold, color = Color.White)
                 }
 
                 IconButton(
@@ -98,7 +106,7 @@ fun Calendar(
                         }
                     }
                 ) {
-                    Text(">", fontSize = 20.sp, fontWeight = Bold)
+                    Text(">", fontSize = 20.sp, fontWeight = Bold, color = Color.White)
                 }
             }
         }
@@ -106,10 +114,13 @@ fun Calendar(
         Box(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .border(1.dp, Color.Black, RoundedCornerShape(15.dp))
+                .clip(RoundedCornerShape(15.dp))
+                .background(color = Color.White)
+             //   .border(1.dp, Color.Black, RoundedCornerShape(15.dp))
                 .padding(8.dp)
                 .width(310.dp)
                 .height(343.dp)
+                .clip(RoundedCornerShape(15.dp))
         ) {
             Column(
                 modifier = Modifier

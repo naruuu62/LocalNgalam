@@ -108,12 +108,20 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  aut
             contentDescription = ""
         )
         Image(
-            painter = painterResource(id = R.drawable.logo_localngalam),
+            painter = painterResource(id = R.drawable.grup),
             contentDescription = "",
             modifier = Modifier
                 .padding(vertical = 90.dp)
                 .padding(horizontal = 113.dp)
         )
+        Image(
+            painter = painterResource(id = R.drawable.localngalam),
+            contentDescription = "",
+            modifier = Modifier
+                .padding(vertical = 170.dp)
+                .padding(horizontal = 113.dp)
+        )
+
         Box(
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {

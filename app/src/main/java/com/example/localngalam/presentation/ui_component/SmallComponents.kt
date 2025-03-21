@@ -4,6 +4,7 @@ package com.example.localngalam.presentation.ui_component
 import android.R.attr.onClick
 import android.R.attr.text
 import android.os.Trace.isEnabled
+import androidx.compose.foundation.Image
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -33,6 +34,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -197,8 +199,8 @@ fun GreenButtonRegisterLogin(
         Text(
             text = text,
             fontSize = 15.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.White
+            fontWeight = FontWeight.Bold,
+            color = Blue3
         )
     }
 }
@@ -217,7 +219,7 @@ fun OrDivider() {
         Text(
             text = "OR",
             fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
             color = Blue,
             modifier = Modifier.padding(horizontal = 4.dp)
         )
@@ -238,9 +240,10 @@ fun GoogleSignUpButton(
         onClick = onClick,
         shape = RoundedCornerShape(17.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Blue
+            containerColor = Color.White
         ),
         modifier = modifier
+            .border(width = 1.dp, color = Blue, shape = RoundedCornerShape(17.dp))
             .width(351.dp)
             .height(54.dp)
             .shadow(4.dp, shape = RoundedCornerShape(17.dp))
@@ -263,7 +266,7 @@ fun GoogleSignUpButton(
                 text = "Sign Up with Google",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.White
+                color = Blue
             )
         }
     }
@@ -588,6 +591,11 @@ fun settingIcon(onItemClick: (String) -> Unit){
                 .size(24.dp)
         )
     }
+}
+
+@Composable
+fun BackgroundImage(modifier: Modifier = Modifier){
+       Image(painterResource(id = R.drawable.background_create_plan), contentDescription = "background", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
 }
 
 
