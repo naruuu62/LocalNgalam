@@ -45,7 +45,6 @@
     import com.example.localngalam.presentation.ui_component.Navbar
     import com.example.localngalam.presentation.ui.theme.Blue
     import com.example.localngalam.presentation.ui.theme.poppinsFont
-    import homeViewModel
     import java.sql.RowId
 
     import androidx.compose.foundation.Image

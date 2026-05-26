@@ -27,14 +27,10 @@ import com.example.localngalam.autentikasi.autentikasiViewModel
 import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 import com.example.localngalam.presentation.ui_component.GreenButtonRegisterLogin
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ResetPasswordScreen2(navController: NavController, modifier: Modifier = Modifier, authViewModel: autentikasiViewModel = viewModel()) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
     val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance()
-    val scope = rememberCoroutineScope()
     val intent = (context as? ComponentActivity)?.intent
     val action = intent?.action
     val data = intent?.data

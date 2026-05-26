@@ -26,14 +26,10 @@ import com.example.localngalam.presentation.ui.theme.Blue
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 import com.example.localngalam.presentation.ui_component.GreenButtonRegisterLogin
 import com.example.localngalam.presentation.ui_component.TextFieldRegisterLoginScreen
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ResetPasswordScreen1(navController: NavController, modifier: Modifier = Modifier, authViewModel: autentikasiViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
-    val auth = FirebaseAuth.getInstance()
-    val user = auth.currentUser
-    val context = LocalContext.current
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

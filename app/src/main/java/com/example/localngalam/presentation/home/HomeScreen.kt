@@ -33,7 +33,6 @@ import com.example.localngalam.R
 import com.example.localngalam.presentation.ui_component.Navbar
 import com.example.localngalam.presentation.ui.theme.Blue3
 import com.example.localngalam.presentation.ui.theme.poppinsFont
-import homeViewModel
 import planViewModel
 
 @Composable

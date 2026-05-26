@@ -1,175 +1,125 @@
 package com.example.localngalam.autentikasi
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.localngalam.data.local.SessionManager
+import com.example.localngalam.data.repository.AuthRepository
 import com.example.localngalam.model.UserData
-import com.example.localngalam.model.saveUserDataFireStore
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class autentikasiViewModel : ViewModel() {
-    private val auth = FirebaseAuth.getInstance()
-    private val lloginState = MutableStateFlow<Boolean?>(null)
-    val loginState: StateFlow<Boolean?> get() = lloginState
-    lateinit var googleSignInClient: GoogleSignInClient
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+class autentikasiViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val sessionManager = SessionManager(application)
+    private val authRepository = AuthRepository(sessionManager)
+
+    // ─── State ────────────────────────────────────────────────────────────────
+
+    private val _loginState = MutableStateFlow<Boolean?>(null)
+    val loginState: StateFlow<Boolean?> get() = _loginState
 
     private val _userData = MutableStateFlow<UserData?>(null)
     val userData: StateFlow<UserData?> get() = _userData
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    // ─── Google Sign-In client (kept for Google OAuth) ─────────────────────
+
+    lateinit var googleSignInClient: GoogleSignInClient
+
     fun initGoogleSignInClient(context: Context) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com") // Ganti dengan ID Anda
+            .requestIdToken("497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com")
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(context, gso)
     }
 
-    fun loginGoogle(onSuccess: () -> Unit, onFailure: (String) -> Unit) {
-        val signInIntent = googleSignInClient.signInIntent
-        onSuccess()
-    }
+    // ─── Auth Methods ─────────────────────────────────────────────────────────
 
-    fun signInWithGoogle(idToken: String) {
+    fun login(email: String, password: String) {
         viewModelScope.launch {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
-            auth.signInWithCredential(credential)
-                .addOnCompleteListener { task ->
-                    lloginState.value = task.isSuccessful
-                    val uid = auth.currentUser?.uid
-                    if (uid != null) {
-                        val user = auth.currentUser
-                        // Simpan data ke Firestore
-                        val userData = UserData(uid = uid,namaLengkap = user?.displayName.toString(), noTelepon = user?.phoneNumber.toString(), email = user?.email.toString())
-                        saveUserDataFireStore(userData)
-
-                        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                        db.collection("users").document(uid)
-                            .set(userData)
-                            .addOnSuccessListener {
-                                Log.d("Firestore", "Data user berhasil disimpan")
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("Firestore", "Gagal menyimpan data user: ${e.message}")
-                            }
-                        getUserDataFromFirestore(uid)
-                    }
+            _isLoading.value = true
+            val result = authRepository.login(email, password)
+            result.fold(
+                onSuccess = { userData ->
+                    _userData.value = userData
+                    _loginState.value = true
+                    Log.d("autentikasiViewModel", "Login berhasil: ${userData.email}")
+                },
+                onFailure = { error ->
+                    _loginState.value = false
+                    Log.e("autentikasiViewModel", "Login gagal: ${error.message}")
                 }
-                .addOnFailureListener { exception ->
-                    viewModelScope.launch {
-                        lloginState.value = false
-                    }
-                }
+            )
+            _isLoading.value = false
         }
     }
 
     fun register(email: String, password: String, namaLengkap: String, noTelepon: String) {
         viewModelScope.launch {
-            auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val uid = auth.currentUser?.uid
-                        if (uid != null){
-                            val user = auth.currentUser
-                            val userData = UserData(uid = uid.toString(),namaLengkap = namaLengkap, noTelepon = noTelepon, email = email)
-                            val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                            db.collection("users").document(uid)
-                                .set(userData)
-                            getUserDataFromFirestore(uid)
-                        }
-                        lloginState.value = true
-                    } else {
-                        lloginState.value = false
-                    }
+            _isLoading.value = true
+            val result = authRepository.register(email, password, namaLengkap, noTelepon)
+            result.fold(
+                onSuccess = { userData ->
+                    _userData.value = userData
+                    _loginState.value = true
+                    Log.d("autentikasiViewModel", "Register berhasil: ${userData.email}")
+                },
+                onFailure = { error ->
+                    _loginState.value = false
+                    Log.e("autentikasiViewModel", "Register gagal: ${error.message}")
                 }
-                .addOnFailureListener {
-                    lloginState.value = false
-                }
+            )
+            _isLoading.value = false
         }
     }
 
-
-
-
-    fun login(email: String, password: String) {
+    fun signInWithGoogle(idToken: String) {
         viewModelScope.launch {
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val uid = auth.currentUser?.uid
-                        if (uid != null){
-                            Log.d("Login", "Login berhasil, mengambil data user dari Firestore: $uid")
-                            getUserDataFromFirestore(uid)
-                        }
-                        lloginState.value = task.isSuccessful
-                    } else {
-                        lloginState.value = false
-                    }
+            _isLoading.value = true
+            val result = authRepository.signInWithGoogle(idToken)
+            result.fold(
+                onSuccess = { userData ->
+                    _userData.value = userData
+                    _loginState.value = true
+                    Log.d("autentikasiViewModel", "Google Sign-In berhasil: ${userData.email}")
+                },
+                onFailure = { error ->
+                    _loginState.value = false
+                    Log.e("autentikasiViewModel", "Google Sign-In gagal: ${error.message}")
                 }
-                .addOnFailureListener { exception ->
-                    viewModelScope.launch {
-                        lloginState.value = false
-                    }
-                }
+            )
+            _isLoading.value = false
         }
     }
-
 
     fun sendPasswordResetEmail(email: String) {
-        auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d("Autentikasi", "Email reset password terkirim")
-            } else {
-                Log.e("Autentikasi", "Gagal mengirim email reset password")
-            }
+        viewModelScope.launch {
+            authRepository.sendPasswordResetEmail(email)
         }
     }
 
-
-
-    fun isUserLoggedIn(): Boolean {
-        return auth.currentUser != null
-    }
+    fun isUserLoggedIn(): Boolean = authRepository.isLoggedIn()
 
     fun signOut() {
-        auth.signOut()
-        if(::googleSignInClient.isInitialized){
-        googleSignInClient.signOut().addOnCompleteListener {
-            lloginState.value = false
-            Log.d("Autentikasi", "Logout berhasil")
+        authRepository.signOut()
+        _loginState.value = false
+        _userData.value = null
+        // Sign out from Google as well
+        if (::googleSignInClient.isInitialized) {
+            googleSignInClient.signOut()
         }
-            }
-        else{
-            Log.e("Autentikasi", "Google Sign-In client belum diinisialisasi")
-        }
-        }
-
-    private fun getUserDataFromFirestore(uid: String) {
-        Log.d("Firestore", "Mengambil data untuk UID: $uid")
-        val db = FirebaseFirestore.getInstance()
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val user = document.toObject(UserData::class.java)
-                    _userData.value = user
-                    Log.d("Firestore", "Data user ditemukan: $user")
-                } else {
-                    Log.e("Firestore", "Data user tidak ditemukan")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firestore", "Gagal mengambil data user: ${exception.message}")
-            }
+        Log.d("autentikasiViewModel", "Logout berhasil")
     }
 
-    }
-
+    val userId: String get() = sessionManager.getUserId() ?: ""
+}

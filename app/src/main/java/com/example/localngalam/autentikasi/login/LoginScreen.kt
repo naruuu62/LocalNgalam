@@ -50,7 +50,6 @@ import com.example.localngalam.presentation.ui_component.OrDivider
 import com.example.localngalam.presentation.ui_component.TextFieldRegisterLoginScreen
 import com.example.localngalam.presentation.ui_component.TextFieldRegisterLoginScreenWithEye
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 @Composable
@@ -66,13 +65,6 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  aut
         authViewModel.initGoogleSignInClient(context)
     }
 
-    val gso = remember {
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com")
-            .requestEmail()
-            .build()
-    }
-    val GoogleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -86,8 +78,6 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  aut
             }
         }
     }
-
-    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
 
     Box(modifier = modifier.fillMaxSize()
         .pointerInput(Unit) {

@@ -34,10 +34,6 @@ import com.example.localngalam.presentation.ui_component.BackgroundImage
 import com.example.localngalam.presentation.ui_component.ButtonNextCreatePlan
 import com.example.localngalam.presentation.ui_component.ButtonPrevCreatePlan
 import com.example.localngalam.presentation.ui_component.Navbar2
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import planViewModel
 import java.time.LocalDate
 
@@ -169,16 +165,15 @@ fun CreatePlanScreen1(navController: NavController, viewModel: planViewModel = v
                         Spacer(modifier = Modifier.weight(1f))
                         ButtonNextCreatePlan(
                             onClick = {
-                                val uid = FirebaseAuth.getInstance().currentUser?.uid
-                                if (uid != null) {
-                                    val perjalanan = Perjalanan(
-                                        namaPerjalanan = planName,
-                                        tanggalBerangkat = startDate.toString(),
-                                        tanggalSelesai = endDate.toString()
-                                    )
+                                if (planName.isNotBlank() && startDate != null && endDate != null) {
                                     viewModel.setNamaPerjalanan(planName)
                                     viewModel.setTanggalBerangkat(startDate.toString())
-                                    viewModel.saveToFirestoreJadwal(perjalanan) {
+                                    viewModel.saveJourney(
+                                        namaPerjalanan = planName,
+                                        tanggalBerangkat = startDate.toString(),
+                                        tanggalSelesai = endDate.toString(),
+                                        tipePerjalanan = ""
+                                    ) {
                                         navController.navigate("create_plan_2")
                                     }
                                 }

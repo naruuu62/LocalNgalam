@@ -30,7 +30,6 @@ import com.example.localngalam.presentation.ui.theme.Blue3
 import com.example.localngalam.presentation.ui_component.BackgroundImage
 import com.example.localngalam.presentation.ui_component.ButtonNextCreatePlan
 import com.example.localngalam.presentation.ui_component.Navbar2
-import com.google.firebase.auth.FirebaseAuth
 import planViewModel
 import java.time.LocalDate
 
@@ -246,13 +245,10 @@ fun CreatePlanScreen2(navController: NavController, viewModel: planViewModel = v
                 Spacer(Modifier.height(60.dp))
                 ButtonNextCreatePlan(
                     onClick = {
-                        val uid = FirebaseAuth.getInstance().currentUser?.uid
-                        if (uid != null) {
-                            if (tipePerjalanan.isNotEmpty()) {
-                                viewModel.updatePlan(tipePerjalanan)
-                            }
-                            navController.navigate("create_plan_3")
+                        if (tipePerjalanan.isNotEmpty()) {
+                            viewModel.updatePlan(tipePerjalanan)
                         }
+                        navController.navigate("create_plan_3")
                     },
                     enabled = tipePerjalanan.isNotEmpty()
                 )

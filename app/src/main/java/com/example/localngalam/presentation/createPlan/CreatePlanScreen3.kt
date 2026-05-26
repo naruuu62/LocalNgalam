@@ -55,9 +55,6 @@ import com.example.localngalam.presentation.ui.theme.Green2
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 import com.example.localngalam.presentation.ui_component.ButtonNextCreatePlan
 import com.example.localngalam.presentation.ui_component.ButtonPrevCreatePlan
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldPath.documentId
-import okhttp3.Request
 import planViewModel
 import java.nio.file.WatchEvent
 
@@ -72,8 +69,6 @@ fun CreatePlanScreen3(navController: NavController, viewModel: planViewModel = v
     var isAdding by remember {   mutableStateOf(false) }
     val tagListState = remember { mutableStateOf<List<Long>>(emptyList()) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
-    val auth = FirebaseAuth.getInstance()
-    val uid = auth.currentUser?.uid ?: ""
     val tempatPerjalanan by viewModel.tempatList.collectAsState(initial = emptyList())
 
 
@@ -532,16 +527,8 @@ fun confirmationDialog(
                 ) {
                     ButtonPrevCreatePlan(onClick = { onDismissRequest() })
                     ButtonNextCreatePlan(onClick = {
-                        val uid = FirebaseAuth.getInstance().currentUser?.uid
-                        if (uid.isNullOrEmpty()) {
-                            Log.e("Firestore", "Gagal mendapatkan UID pengguna!")
-                            return@ButtonNextCreatePlan
-                        }
-
                         val jamMulai = "${startHour1}${startHour2}:${startMinute1}${startMinute2}"
                         val jamSelesai = "${endHour1}${endHour2}:${endMinute1}${endMinute2}"
-
-
                         onConfirmation(jamMulai, jamSelesai)
                     })
                 }

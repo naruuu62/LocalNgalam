@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -30,16 +29,20 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.localngalam.R
+import com.example.localngalam.model.Perjalanan
 import com.example.localngalam.presentation.ui.theme.Blue3
 import com.example.localngalam.presentation.ui.theme.poppinsFont
 import com.example.localngalam.presentation.ui_component.Navbar
 import planViewModel
 
 @Composable
-fun HistoryScreen(navController: NavController, viewModel: HistoryViewModel = viewModel(), planViewModel: planViewModel = viewModel()) {
-    val journeyData by viewModel.journeyData.collectAsStateWithLifecycle()
-    val tanggalBerangkat by planViewModel.tanggalBerangkat.collectAsStateWithLifecycle() // Ambil tanggal dari planViewModel
-
+fun HistoryScreen(
+    navController: NavController,
+    viewModel: HistoryViewModel = viewModel(),
+    planViewModel: planViewModel = viewModel()
+) {
+    val journeyList by viewModel.journeyList.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.fetchJourneyData()
@@ -57,125 +60,116 @@ fun HistoryScreen(navController: NavController, viewModel: HistoryViewModel = vi
         },
         containerColor = Color.White
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            journeyData?.let { data ->
-                val tanggalBerangkat = data["tanggalBerangkat"] as? String ?: ""
-                val daftarPerjalanan = data["daftarPerjalanan"] as? List<Map<String, Any>> ?: emptyList()
-                val namaPerjalanan = data["namaPerjalanan"] as? String ?: ""
-
-                Text(
-                    text = "Rencana Perjalanan ($tanggalBerangkat)", // Menambahkan tanggal ke header
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Blue3,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    textAlign = TextAlign.Center
-                )
-
-                if (daftarPerjalanan.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .weight(1f), // Agar konten berada di tengah
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Belum ada perjalanan yang tersimpan",
-                            textAlign = TextAlign.Center
-                        )
+        Box(modifier = Modifier.padding(paddingValues)) {
+            if (isLoading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (journeyList.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Belum ada perjalanan yang tersimpan",
+                        textAlign = TextAlign.Center,
+                        fontFamily = poppinsFont,
+                        color = Color.Gray
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(journeyList) { journey ->
+                        JourneyCard(journey = journey, planViewModel = planViewModel)
                     }
+                }
+            }
+        }
+    }
+}
 
-
-                } else {
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row {
-                        Spacer(modifier = Modifier.width(18.dp))
-                        Text(
-                            text = "$namaPerjalanan",
-                            fontSize = 20.sp,
-                            fontFamily = poppinsFont,
-                            color = Blue3,
-                            fontWeight = Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    LazyColumn(
+@Composable
+private fun JourneyCard(journey: Perjalanan, planViewModel: planViewModel) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = journey.namaPerjalanan,
+                fontSize = 16.sp,
+                fontWeight = Bold,
+                fontFamily = poppinsFont,
+                color = Blue3
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${journey.tanggalBerangkat} – ${journey.tanggalSelesai}",
+                fontSize = 12.sp,
+                fontFamily = poppinsFont,
+                color = Color.Gray
+            )
+            if (journey.daftarPerjalanan.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                journey.daftarPerjalanan.forEach { tempat ->
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f) // Agar LazyColumn mengisi ruang yang tersedia
+                            .padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(daftarPerjalanan) { trip ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                colors = CardDefaults.cardColors(Color.White)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Image(
-                                        painter = rememberImagePainter(data = trip["gambar"]),
-                                        contentDescription = "Gambar Tempat",
-                                        modifier = Modifier
-                                            .size(120.dp)
-                                            .clip(RoundedCornerShape(8.dp)),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = trip["namaTempat"] as? String
-                                                ?: "Nama Tidak Diketahui",
-                                            fontWeight = FontWeight.Bold,
-                                            color = Blue3,
-                                            fontFamily = poppinsFont
-                                        )
-                                        Text(
-                                            text = trip["address"] as? String
-                                                ?: "Alamat Tidak Diketahui",
-                                            fontFamily = poppinsFont,
-                                            fontSize = 12.sp,
-                                            color = Color.Gray
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Row {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.jam),
-                                                contentDescription = "Jam Mulai",
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                            Text(text = " ${trip["jamMulai"] ?: "-"} - ${trip["jamSelesai"] ?: "-"}", fontFamily = poppinsFont)
-                                        }
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Row {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.telepon),
-                                                contentDescription = "Nomor Telepon",
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                            Text(text = " ${trip["nomorTelepon"] ?: "-"}")
-                                        }
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(
-                                            text = trip["deskripsi"] as? String
-                                                ?: "Deskripsi Tidak Diketahui", fontFamily = poppinsFont
-                                        )
-                                    }
-                                    IconButton(onClick = { /* Handle delete */ }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "Hapus"
-                                        )
-                                    }
-                                }
+                        Image(
+                            painter = rememberImagePainter(data = tempat.gambar),
+                            contentDescription = "Gambar ${tempat.namaTempat}",
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = tempat.namaTempat,
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = poppinsFont,
+                                color = Blue3
+                            )
+                            Text(
+                                text = tempat.address,
+                                fontSize = 11.sp,
+                                fontFamily = poppinsFont,
+                                color = Color.Gray
+                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.jam),
+                                    contentDescription = "Jam",
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "${tempat.jamMulai} – ${tempat.jamSelesai}",
+                                    fontSize = 11.sp,
+                                    fontFamily = poppinsFont
+                                )
                             }
+                        }
+                        IconButton(
+                            onClick = {
+                                planViewModel.hapusTempatDariFirestore(tempat)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Hapus",
+                                tint = Color.Red.copy(alpha = 0.7f)
+                            )
                         }
                     }
                 }

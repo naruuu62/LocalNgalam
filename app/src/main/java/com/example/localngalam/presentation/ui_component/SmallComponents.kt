@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.localngalam.R
 import com.example.localngalam.presentation.ui.theme.*
-import com.google.firebase.annotations.concurrent.Background
 
 @Composable
 fun TextFieldRegisterLoginScreen(

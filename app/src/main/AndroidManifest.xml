@@ -27,6 +27,7 @@
             </intent-filter>
         </activity>
 
+        <!-- ResetPassword activity — deep link domain updated for Supabase -->
         <activity
             android:name=".BackEnd.ResetPasswordActivity"
             android:exported="true">
@@ -35,17 +36,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <!-- Deep link untuk reset password -->
+                <!-- Deep link dari email reset password Supabase -->
                 <data
                     android:scheme="https"
-                    android:host="naru-c8575.firebaseapp.com"
-                    android:pathPrefix="/resetpassword" />
-
-                <!-- Deep link untuk verifikasi email -->
-                <data
-                    android:scheme="https"
-                    android:host="naru-c8575.firebaseapp.com"
-                    android:pathPrefix="/verifyemail" />
+                    android:host="bjbzbuxcyrjckpfjdolb.supabase.co"
+                    android:pathPrefix="/auth/v1/verify" />
             </intent-filter>
         </activity>
 

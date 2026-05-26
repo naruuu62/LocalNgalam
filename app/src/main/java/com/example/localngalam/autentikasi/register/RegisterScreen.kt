@@ -33,7 +33,6 @@ import com.example.localngalam.presentation.ui_component.GreenButtonRegisterLogi
 import com.example.localngalam.presentation.ui_component.OrDivider
 import com.example.localngalam.presentation.ui_component.TextFieldRegisterLoginScreen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 @Composable
@@ -47,13 +46,10 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
     var isRegistWrong by remember {mutableStateOf(false)}
     val focusManager = LocalFocusManager.current
 
-    val gso = remember {
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com")
-            .requestEmail()
-            .build()
+    LaunchedEffect(Unit) {
+        authViewModel.initGoogleSignInClient(context)
     }
-    val GoogleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
+
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -67,8 +63,6 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
             }
         }
     }
-
-    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
 
 //=======
     Box(modifier = modifier.fillMaxSize()
@@ -218,9 +212,8 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
 
                 GoogleSignUpButton(
                     onClick = {
-                        val signInIntent = googleSignInClient.signInIntent
+                        val signInIntent = authViewModel.googleSignInClient.signInIntent
                         launcher.launch(signInIntent)
-                        /* login gugel */
                     }
                 )
 

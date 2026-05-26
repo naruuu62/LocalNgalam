@@ -1,31 +1,38 @@
 package com.example.localngalam.presentation.history
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.localngalam.data.local.SessionManager
+import com.example.localngalam.data.repository.JourneyRepository
+import com.example.localngalam.model.Perjalanan
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
-class HistoryViewModel : ViewModel() {
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-    private val _journeyData = MutableStateFlow<Map<String, Any>?>(null)
-    val journeyData: StateFlow<Map<String, Any>?> = _journeyData
+class HistoryViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val sessionManager = SessionManager(application)
+    private val journeyRepository = JourneyRepository(sessionManager)
+
+    private val _journeyList = MutableStateFlow<List<Perjalanan>>(emptyList())
+    val journeyList: StateFlow<List<Perjalanan>> = _journeyList
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     fun fetchJourneyData() {
-        val uid = auth.currentUser?.uid ?: return
-
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                val snapshot = db.collection("journey").document(uid).get().await()
-                _journeyData.value = snapshot.data
+                val journeys = journeyRepository.getAllJourneys()
+                _journeyList.value = journeys
+                Log.d("HistoryViewModel", "Berhasil mengambil ${journeys.size} perjalanan")
             } catch (e: Exception) {
-                Log.e("HistoryViewModel", "Gagal mengambil data perjalanan", e)
+                Log.e("HistoryViewModel", "Gagal mengambil data perjalanan: ${e.message}", e)
             }
+            _isLoading.value = false
         }
     }
 }

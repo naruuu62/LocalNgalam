@@ -16,7 +16,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.localngalam.autentikasi.autentikasiViewModel
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LogoutScreen(navController: NavController, authViewModel: autentikasiViewModel = viewModel()) {
