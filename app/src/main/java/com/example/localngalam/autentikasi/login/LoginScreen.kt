@@ -95,21 +95,22 @@ fun LoginScreen(navController: NavController,modifier: Modifier = Modifier,  aut
         )
         Image(
             painter = painterResource(id = R.drawable.shadow_login_register_screen),
-            contentDescription = ""
+            contentDescription = "",
+            modifier = Modifier.fillMaxWidth()
         )
         Image(
             painter = painterResource(id = R.drawable.grup),
             contentDescription = "",
             modifier = Modifier
-                .padding(vertical = 90.dp)
-                .padding(horizontal = 113.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = 90.dp)
         )
         Image(
             painter = painterResource(id = R.drawable.localngalam),
             contentDescription = "",
             modifier = Modifier
-                .padding(vertical = 170.dp)
-                .padding(horizontal = 113.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = 170.dp)
         )
 
         Box(

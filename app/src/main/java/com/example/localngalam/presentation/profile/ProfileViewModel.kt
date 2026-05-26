@@ -37,9 +37,12 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             val userData = userRepository.getUserById(userId)
             if (userData != null) {
                 _userData.value = userData
+                // Cache nama ke SessionManager untuk dipakai di review
+                if (userData.namaLengkap.isNotBlank()) {
+                    sessionManager.saveUserName(userData.namaLengkap)
+                }
                 Log.d("ProfileViewModel", "Data user ditemukan: ${userData.namaLengkap}")
             } else {
-                // Fallback: populate from session if Supabase returns nothing yet
                 _userData.value = UserData(
                     uid = userId,
                     email = sessionManager.getUserEmail() ?: "",
@@ -50,5 +53,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             }
             _isLoading.value = false
         }
+    }
+
+    fun logout() {
+        sessionManager.clearSession()
     }
 }

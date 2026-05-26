@@ -173,7 +173,11 @@ fun CreatePlanScreen1(navController: NavController, viewModel: planViewModel = v
                                         tanggalBerangkat = startDate.toString(),
                                         tanggalSelesai = endDate.toString(),
                                         tipePerjalanan = ""
-                                    ) {
+                                    ) { journeyId ->
+                                        // Simpan journeyId agar bisa dibaca di Screen3
+                                        navController.currentBackStackEntry
+                                            ?.savedStateHandle
+                                            ?.set("currentJourneyId", journeyId)
                                         navController.navigate("create_plan_2")
                                     }
                                 }

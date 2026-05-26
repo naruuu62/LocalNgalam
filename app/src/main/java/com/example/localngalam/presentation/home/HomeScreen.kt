@@ -43,6 +43,11 @@ fun HomeScreen(
     onClick : (Tempat) -> Unit
 ) {
     val tempatList by viewModel.tempatList.collectAsState()
+    
+    // Asumsi: Kita ganti tipe viewModel ke homeViewModel untuk mengakses userData
+    val homeViewModel: com.example.localngalam.presentation.home.homeViewModel = viewModel()
+    val userData by homeViewModel.userData.collectAsState()
+    val namaPengguna = userData?.namaLengkap?.split(" ")?.firstOrNull() ?: "Pengguna"
 
     Scaffold(
         bottomBar = {
@@ -86,7 +91,7 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.Start
                     ) {
                         Text(
-                            text = "Mau pergi ke mana, \nHessi?",
+                            text = "Mau pergi ke mana, \n$namaPengguna?",
                             fontSize = 20.sp,
                             fontFamily = poppinsFont,
                             fontWeight = FontWeight.Bold,

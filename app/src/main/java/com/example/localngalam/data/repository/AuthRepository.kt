@@ -8,6 +8,7 @@
     import com.example.localngalam.data.remote.dto.RegisterRequest
     import com.example.localngalam.data.remote.dto.ResetPasswordRequest
     import com.example.localngalam.model.UserData
+    import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
     private const val TAG = "AuthRepository"
 
@@ -52,7 +53,8 @@
             email: String,
             password: String,
             namaLengkap: String,
-            noTelepon: String
+            noTelepon: String,
+            avatarBytes: ByteArray? = null
         ): Result<UserData> {
             return try {
                 val request = RegisterRequest(
@@ -76,11 +78,29 @@
 
                     sessionManager.saveSession(accessToken, refreshToken, userId, userEmail)
 
+                    var avatarUrl: String? = null
+                    if (avatarBytes != null) {
+                        try {
+                            val authenticatedApi = RetrofitClient.authenticated(accessToken)
+                            val filename = "$userId-${System.currentTimeMillis()}.jpg"
+                            val requestBody = okhttp3.RequestBody.create("image/jpeg".toMediaTypeOrNull(), avatarBytes)
+                            val uploadResponse = authenticatedApi.uploadAvatar(filename, requestBody)
+                            if (uploadResponse.isSuccessful) {
+                                avatarUrl = "${com.example.localngalam.data.remote.SupabaseConfig.BASE_URL}storage/v1/object/public/avatars/$filename"
+                            } else {
+                                Log.e(TAG, "Gagal upload avatar: ${uploadResponse.errorBody()?.string()}")
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Exception upload avatar", e)
+                        }
+                    }
+
                     val userData = UserData(
                         uid = userId,
                         email = userEmail,
                         namaLengkap = namaLengkap,
-                        noTelepon = noTelepon
+                        noTelepon = noTelepon,
+                        fotoProfil = avatarUrl
                     )
                     userRepository.upsertUser(userData)
                     Result.success(userData)

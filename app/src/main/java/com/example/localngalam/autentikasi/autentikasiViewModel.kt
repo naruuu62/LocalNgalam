@@ -37,7 +37,7 @@ class autentikasiViewModel(application: Application) : AndroidViewModel(applicat
 
     fun initGoogleSignInClient(context: Context) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("497053976903-62igeq8ktk2iqoa06mp68vh94gihgg1v.apps.googleusercontent.com")
+            .requestIdToken("497053976903-cnniekv6vj70m4n04n9a50v31rttq0og.apps.googleusercontent.com")
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(context, gso)
@@ -64,10 +64,22 @@ class autentikasiViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    fun register(email: String, password: String, namaLengkap: String, noTelepon: String) {
+    fun register(email: String, password: String, namaLengkap: String, noTelepon: String, avatarUri: android.net.Uri? = null) {
         viewModelScope.launch {
             _isLoading.value = true
-            val result = authRepository.register(email, password, namaLengkap, noTelepon)
+            
+            var avatarBytes: ByteArray? = null
+            if (avatarUri != null) {
+                try {
+                    val inputStream = getApplication<Application>().contentResolver.openInputStream(avatarUri)
+                    avatarBytes = inputStream?.readBytes()
+                    inputStream?.close()
+                } catch (e: Exception) {
+                    Log.e("autentikasiViewModel", "Gagal membaca foto profil", e)
+                }
+            }
+
+            val result = authRepository.register(email, password, namaLengkap, noTelepon, avatarBytes)
             result.fold(
                 onSuccess = { userData ->
                     _userData.value = userData

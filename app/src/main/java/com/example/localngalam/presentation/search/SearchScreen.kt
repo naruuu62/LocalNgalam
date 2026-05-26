@@ -1,9 +1,6 @@
 package com.example.localngalam.presentation.search
 
 import Tempat
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,156 +8,181 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.localngalam.R
 import com.example.localngalam.presentation.ui.theme.Blue3
-import com.example.localngalam.presentation.ui.theme.Blue4
-import com.example.localngalam.presentation.ui.theme.Blue5
 import com.example.localngalam.presentation.ui_component.Navbar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavController, viewModel: SearchViewModel = viewModel(), onClick : (Tempat) -> Unit) {
+fun SearchScreen(
+    navController: NavController,
+    viewModel: SearchViewModel = viewModel(),
+    onClick: (Tempat) -> Unit
+) {
     var searchText by remember { mutableStateOf("") }
     var sortOption by remember { mutableStateOf("Default") }
     var selectedCategory by remember { mutableStateOf("All") }
 
-    LaunchedEffect(selectedCategory) {
-        viewModel.getTempatFilter(selectedCategory)
+    // Load semua data saat pertama kali buka
+    LaunchedEffect(Unit) {
+        viewModel.getTempatFilter("All")
     }
 
+    val rawList by viewModel.tempatList.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
-    val tempatList = viewModel.tempatList.value?.let { list ->
-        val filteredList = if (selectedCategory == "All") list else list.filter { it.category == selectedCategory }
-        val searchedList = if (searchText.isNotEmpty()) {
-            filteredList.filter { it.id.lowercase().contains(searchText.lowercase()) }
-        } else {
-            filteredList
-        }
+    val tempatList = remember(rawList, searchText, sortOption, selectedCategory) {
+        val filtered = if (selectedCategory == "All") rawList
+                       else rawList.filter { it.category == selectedCategory }
+        val searched = if (searchText.isNotEmpty())
+            filtered.filter { it.namaLokasi.lowercase().contains(searchText.lowercase()) }
+        else filtered
         when (sortOption) {
-            "Harga Rendah" -> filteredList.sortedBy { it.priceRange }
-            "Harga Tertinggi" -> filteredList.sortedByDescending { it.priceRange }
-            else -> searchedList
+            "Harga Rendah"    -> searched.sortedBy { it.priceRange }
+            "Harga Tertinggi" -> searched.sortedByDescending { it.priceRange }
+            else              -> searched
         }
-    } ?: emptyList()
-
+    }
 
     Scaffold(
         bottomBar = {
             Navbar(
-                onHomeClick = { navController.navigate("home") },
-                onSearchClick = { navController.navigate("search") },
-                onPlusClick = { navController.navigate("add_plan") },
+                onHomeClick    = { navController.navigate("home") },
+                onSearchClick  = { navController.navigate("search") },
+                onPlusClick    = { navController.navigate("add_plan") },
                 onHistoryClick = { navController.navigate("history") },
                 onProfileClick = { navController.navigate("profile") }
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 12.dp)
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Search bar
             OutlinedTextField(
                 singleLine = true,
                 value = searchText,
                 onValueChange = { searchText = it },
                 placeholder = { Text("Pergi kemana hari ini?") },
                 leadingIcon = {
-                    Icon(
-                        painterResource(id = R.drawable.ic_navbar_search),
-                        contentDescription = "Search"
-                    )
+                    Icon(painterResource(id = R.drawable.ic_navbar_search), contentDescription = "Search")
                 },
-                modifier = Modifier.fillMaxWidth()
+                trailingIcon = {
+                    if (searchText.isNotEmpty()) {
+                        IconButton(onClick = { searchText = "" }) {
+                            Icon(Icons.Default.Close, contentDescription = "Clear")
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Icon(painterResource(id = R.drawable.search), contentDescription = "Location")
-                Text(
-                    text = "Sawojajar, Malang",
-                    fontSize = 14.sp,
-                    color = Blue3,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
+            Spacer(modifier = Modifier.height(8.dp))
 
-            LazyRow(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                items(listOf("All", "Alam", "Cafe", "Restoran", "Hotel")) { category ->
-                    Button(
-                        onClick = {
-                            selectedCategory = category
-                            viewModel.getTempatFilter(category)
-                        },
-                        colors = ButtonDefaults.buttonColors(if (selectedCategory == category) Blue5 else Blue4)
-                    ) {
-                        Text(category)
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
+            // Filter kategori
+            LazyRow(modifier = Modifier.fillMaxWidth()) {
+                items(listOf("All", "Alam", "Cafe", "Restoran")) { category ->
+                    FilterChip(
+                        selected = selectedCategory == category,
+                        onClick = { selectedCategory = category },
+                        label = { Text(category) },
+                        modifier = Modifier.padding(end = 6.dp)
+                    )
                 }
             }
 
+            Spacer(modifier = Modifier.height(4.dp))
 
-            LazyRow(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            // Sort option
+            LazyRow(modifier = Modifier.fillMaxWidth()) {
                 items(listOf("Default", "Harga Rendah", "Harga Tertinggi")) { option ->
-                    Button(
-                        shape = RoundedCornerShape(25.dp),
-                        modifier = Modifier.padding(start = 8.dp).height(42.dp).width(170.dp),
+                    FilterChip(
+                        selected = sortOption == option,
                         onClick = { sortOption = option },
-                        colors = ButtonDefaults.buttonColors(if (sortOption == option) Blue5 else Blue4)
-                    ) {
-                        Text(option)
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
+                        label = { Text(option, fontSize = 12.sp) },
+                        modifier = Modifier.padding(end = 6.dp)
+                    )
                 }
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(tempatList) { tempat ->
-                    Card(
-                        colors = CardDefaults.cardColors(Color.White),
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                            .clickable {
-                                //detail
-                                onClick(tempat)
-                            },
-                    ) {
-                        Row(modifier = Modifier.padding(16.dp)) {
-                            AsyncImage(
-                                model = tempat.gambar,
-                                contentDescription = "Image",
-                                modifier = Modifier.size(80.dp)
-                            )
-                            Column(modifier = Modifier.padding(start = 8.dp)) {
-                                Text(
-                                    text = tempat.id,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp,
-                                    color = Blue3
+            if (isLoading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (tempatList.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Tidak ada tempat ditemukan", color = Color.Gray)
+                }
+            } else {
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(tempatList) { tempat ->
+                        Card(
+                            colors = CardDefaults.cardColors(Color.White),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp)
+                                .clickable { onClick(tempat) },
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Row(modifier = Modifier.padding(12.dp)) {
+                                AsyncImage(
+                                    model = tempat.gambar,
+                                    contentDescription = tempat.namaLokasi,
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .clip(RoundedCornerShape(8.dp))
                                 )
-                                Text(text = tempat.address, fontSize = 14.sp, color = Color.Gray)
-                                Text(
-                                    text = "Harga: Rp ${viewModel.getHarga(tempat.priceRange)}/pax",
-                                    fontSize = 14.sp
-                                )
-                                Text(text = tempat.deskripsi, fontSize = 14.sp, color = Color.Black)
-
+                                Column(
+                                    modifier = Modifier
+                                        .padding(start = 12.dp)
+                                        .weight(1f)
+                                ) {
+                                    Text(
+                                        text = tempat.namaLokasi.ifBlank { tempat.id },
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        color = Blue3
+                                    )
+                                    Text(
+                                        text = tempat.address,
+                                        fontSize = 12.sp,
+                                        color = Color.Gray
+                                    )
+                                    Text(
+                                        text = viewModel.getHarga(tempat.priceRange),
+                                        fontSize = 12.sp
+                                    )
+                                    Text(
+                                        text = tempat.category,
+                                        fontSize = 11.sp,
+                                        color = Blue3
+                                    )
+                                }
                             }
-
                         }
                     }
                 }
@@ -168,4 +190,3 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel = view
         }
     }
 }
-

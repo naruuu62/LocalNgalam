@@ -24,7 +24,8 @@ class UserRepository(private val sessionManager: SessionManager) {
                         uid = it.uid,
                         namaLengkap = it.namaLengkap,
                         noTelepon = it.noTelepon,
-                        email = it.email
+                        email = it.email,
+                        fotoProfil = it.fotoProfil
                     )
                 }
             } else {
@@ -43,7 +44,8 @@ class UserRepository(private val sessionManager: SessionManager) {
                 uid = userData.uid,
                 namaLengkap = userData.namaLengkap,
                 noTelepon = userData.noTelepon,
-                email = userData.email
+                email = userData.email,
+                fotoProfil = userData.fotoProfil
             )
             val response = api().upsertUser(request)
             if (response.isSuccessful) {

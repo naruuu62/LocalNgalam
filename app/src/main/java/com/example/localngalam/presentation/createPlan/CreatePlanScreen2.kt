@@ -245,6 +245,12 @@ fun CreatePlanScreen2(navController: NavController, viewModel: planViewModel = v
                 Spacer(Modifier.height(60.dp))
                 ButtonNextCreatePlan(
                     onClick = {
+                        val journeyId = navController.previousBackStackEntry?.savedStateHandle?.get<String>("currentJourneyId")
+                        if (journeyId != null) {
+                            navController.currentBackStackEntry?.savedStateHandle?.set("currentJourneyId", journeyId)
+                            viewModel.setDocumentId(journeyId) // In case Screen2 needs to update plan
+                        }
+                        
                         if (tipePerjalanan.isNotEmpty()) {
                             viewModel.updatePlan(tipePerjalanan)
                         }

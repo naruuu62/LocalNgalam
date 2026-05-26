@@ -77,7 +77,7 @@ class planViewModel(application: Application) : AndroidViewModel(application) {
         tanggalBerangkat: String,
         tanggalSelesai: String,
         tipePerjalanan: String,
-        onSuccess: () -> Unit = {}
+        onSuccess: (String) -> Unit = {}
     ) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -90,7 +90,7 @@ class planViewModel(application: Application) : AndroidViewModel(application) {
             if (journeyId != null) {
                 currentJourneyId = journeyId
                 Log.d("planViewModel", "Journey berhasil disimpan: $journeyId")
-                onSuccess()
+                onSuccess(journeyId)
             } else {
                 Log.e("planViewModel", "Gagal menyimpan journey")
             }
@@ -144,7 +144,7 @@ class planViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         viewModelScope.launch {
-            val currentJourney = journeyRepository.getJourney()
+            val currentJourney = journeyRepository.getJourneyById(journeyId)
             val currentList = currentJourney?.daftarPerjalanan?.toMutableList() ?: mutableListOf()
 
             val newTempat = tempatPerjalanan(
@@ -193,7 +193,7 @@ class planViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                val currentJourney = journeyRepository.getJourney()
+                val currentJourney = journeyRepository.getJourneyById(journeyId)
                 val currentList = currentJourney?.daftarPerjalanan ?: emptyList()
 
                 val newTempat = tempatPerjalanan(
@@ -229,7 +229,7 @@ class planViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         viewModelScope.launch {
-            val currentJourney = journeyRepository.getJourney()
+            val currentJourney = journeyRepository.getJourneyById(journeyId)
             val currentList = currentJourney?.daftarPerjalanan ?: emptyList()
             val success = journeyRepository.hapusTempatDariPerjalanan(journeyId, currentList, tempat)
             if (success) {

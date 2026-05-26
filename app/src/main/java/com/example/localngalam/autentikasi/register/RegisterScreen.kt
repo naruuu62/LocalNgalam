@@ -4,6 +4,7 @@ import android.app.Activity.RESULT_OK
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +43,7 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
     var namaLengkap by remember { mutableStateOf("") }
     var noTelepon by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var avatarUri by remember { mutableStateOf<android.net.Uri?>(null) }
     val loginState by authViewModel.loginState.collectAsState()
     val context = LocalContext.current
     var isRegistWrong by remember {mutableStateOf(false)}
@@ -63,6 +66,12 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
             }
         }
     }
+    
+    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            avatarUri = uri
+        }
+    }
 
 //=======
     Box(modifier = modifier.fillMaxSize()
@@ -83,21 +92,22 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
         )
         Image(
             painter = painterResource(id = R.drawable.shadow_login_register_screen),
-            contentDescription = ""
+            contentDescription = "",
+            modifier = Modifier.fillMaxWidth()
         )
         Image(
             painter = painterResource(id = R.drawable.grup),
             contentDescription = "",
             modifier = Modifier
-                .padding(vertical = 90.dp)
-                .padding(horizontal = 113.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = 90.dp)
         )
         Image(
             painter = painterResource(id = R.drawable.localngalam),
             contentDescription = "",
             modifier = Modifier
-                .padding(vertical = 170.dp)
-                .padding(horizontal = 113.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = 170.dp)
         )
         Box(
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -125,7 +135,31 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
                     textAlign = TextAlign.Center,
                 )
 
-                Spacer(modifier = Modifier.height(26.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Box(
+                    modifier = Modifier
+                        .size(70.dp)
+                        .background(Color.LightGray, shape = androidx.compose.foundation.shape.CircleShape)
+                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .clickable {
+                            pickMedia.launch(androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (avatarUri != null) {
+                        coil.compose.AsyncImage(
+                            model = avatarUri,
+                            contentDescription = "Profile Picture",
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Text(text = "Foto", color = Color.DarkGray, fontSize = 12.sp)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 TextFieldRegisterLoginScreen(
                     value = email,
@@ -134,7 +168,7 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
                     leadingIcon = R.drawable.ic_email
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 TextFieldRegisterLoginScreen(
                     value = namaLengkap,
@@ -143,7 +177,7 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
                     leadingIcon = R.drawable.ic_phone
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 TextFieldRegisterLoginScreen(
                     value = noTelepon,
@@ -152,7 +186,7 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
                     leadingIcon = R.drawable.ic_person
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 TextFieldRegisterLoginScreen(
                     value = password,
@@ -160,7 +194,7 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
                     placeholderText = "Kata Sandi",
                     leadingIcon = R.drawable.ic_password
                 )
-                Spacer(modifier = Modifier.height(51.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Row (
                     verticalAlignment = Alignment.CenterVertically,
@@ -189,18 +223,29 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
                         if (password.isEmpty() || email.isEmpty() || password.length < 8) {
                             isRegistWrong = true
                         } else {
-                            authViewModel.register(email, password, namaLengkap, noTelepon)
+                            authViewModel.register(email, password, namaLengkap, noTelepon, avatarUri)
                             /* DAFTAR AKUN */
                         }
                     }
                 )
 
                 LaunchedEffect(loginState) {
-                    if (loginState == false) {
-                        isRegistWrong = true
-                        navController.navigate("home")
-                    } else if(loginState == true) {
-                        navController.navigate("home")
+                    when (loginState) {
+
+                        true -> {
+                            isRegistWrong = false
+
+                            navController.navigate("home") {
+                                popUpTo("register") { inclusive = true }
+                            }
+                        }
+
+                        false -> {
+                            isRegistWrong = true
+                        }
+
+                        null -> {
+                        }
                     }
                 }
 

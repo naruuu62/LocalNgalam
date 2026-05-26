@@ -18,6 +18,7 @@ class SessionManager(context: Context) {
         private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_USER_ID = "user_id"
         private const val KEY_USER_EMAIL = "user_email"
+        private const val KEY_USER_NAME = "user_name"
         private const val KEY_GOOGLE_ID_TOKEN = "google_id_token"
     }
 
@@ -25,13 +26,15 @@ class SessionManager(context: Context) {
         accessToken: String,
         refreshToken: String,
         userId: String,
-        email: String
+        email: String,
+        userName: String = ""
     ) {
         prefs.edit().apply {
             putString(KEY_ACCESS_TOKEN, accessToken)
             putString(KEY_REFRESH_TOKEN, refreshToken)
             putString(KEY_USER_ID, userId)
             putString(KEY_USER_EMAIL, email)
+            if (userName.isNotBlank()) putString(KEY_USER_NAME, userName)
             apply()
         }
     }
@@ -47,6 +50,10 @@ class SessionManager(context: Context) {
     fun getUserId(): String? = prefs.getString(KEY_USER_ID, null)
 
     fun getUserEmail(): String? = prefs.getString(KEY_USER_EMAIL, null)
+
+    fun getUserName(): String? = prefs.getString(KEY_USER_NAME, null)
+
+    fun saveUserName(name: String) = prefs.edit().putString(KEY_USER_NAME, name).apply()
 
     fun getGoogleIdToken(): String? = prefs.getString(KEY_GOOGLE_ID_TOKEN, null)
 

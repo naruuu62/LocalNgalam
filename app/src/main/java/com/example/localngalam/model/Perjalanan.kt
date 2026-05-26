@@ -5,6 +5,7 @@ package com.example.localngalam.model
  * Firebase imports removed — persistence handled by JourneyRepository via Supabase.
  */
 data class Perjalanan(
+    val id: String = "",
     val namaPerjalanan: String = "",
     val tanggalBerangkat: String = "",
     val tanggalSelesai: String = "",

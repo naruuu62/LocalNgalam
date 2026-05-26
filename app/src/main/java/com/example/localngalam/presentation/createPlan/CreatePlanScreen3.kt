@@ -61,7 +61,8 @@ import java.nio.file.WatchEvent
 
 @Composable
 fun CreatePlanScreen3(navController: NavController, viewModel: planViewModel = viewModel()) {
-    val documentId = navController.previousBackStackEntry?.savedStateHandle?.get<String>("documentId") ?: ""
+    // Ambil journeyId yang diteruskan dari Screen1 via savedStateHandle
+    val journeyId = navController.previousBackStackEntry?.savedStateHandle?.get<String>("currentJourneyId") ?: ""
     val tempatList by viewModel.tempatList.collectAsState()
     var selectedCategory by remember { mutableStateOf("All") }
     var selectedPlaces by remember { mutableStateOf<List<Tempat>>(emptyList()) }
@@ -70,6 +71,13 @@ fun CreatePlanScreen3(navController: NavController, viewModel: planViewModel = v
     val tagListState = remember { mutableStateOf<List<Long>>(emptyList()) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
     val tempatPerjalanan by viewModel.tempatList.collectAsState(initial = emptyList())
+
+    // Set journeyId ke ViewModel agar bisa update daftar perjalanan
+    LaunchedEffect(journeyId) {
+        if (journeyId.isNotBlank()) {
+            viewModel.setDocumentId(journeyId)
+        }
+    }
 
 
 
@@ -172,7 +180,7 @@ fun CreatePlanScreen3(navController: NavController, viewModel: planViewModel = v
                                     Spacer(modifier = Modifier.width(12.dp))
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = selectedPlace.id,
+                                            text = selectedPlace.namaLokasi.ifBlank { selectedPlace.id },
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             color = Blue3,
@@ -261,34 +269,22 @@ fun CreatePlanScreen3(navController: NavController, viewModel: planViewModel = v
             confirmationDialog(
                 onDismissRequest = { showConfirmationDialog = false },
                 onConfirmation = { jamMulai, jamSelesai ->
-                    val index = selectedPlaces.indexOf(selectedPlace)
-                    if (index != -1) {
-                        selectedPlaces = selectedPlaces.toMutableList().apply {
-                            this[index] = this[index].copy(
-                                open = jamMulai,
-                                close = jamSelesai
-                            )
-                        }
-                    }
-
-                    val tempatPerjalanan = selectedPlaces.map {
-                            tempat -> tempatPerjalanan(
-                        tempatId = tempat.id,
-                        namaTempat = tempat.id,
-                        jamMulai = jamMulai,
-                        jamSelesai = jamSelesai
-                    )
-
-
-                    }
-                    tempatPerjalanan.forEach {
-                            tempat -> viewModel.updateDaftarPerjalanan(tempatId = tempat.tempatId, namaTempat = tempat.tempatId, jamMulai = jamMulai, jamSelesai = jamSelesai,
-                        gambar = selectedPlace?.gambar ?: "",
-                        address = selectedPlace?.address ?: "", deskripsi = selectedPlace?.deskripsi ?: "", nomorTelepon = selectedPlace?.phoneNumber ?: "")
+                    selectedPlace?.let { place ->
+                        val nama = place.namaLokasi.ifBlank { place.id }
+                        viewModel.updateDaftarPerjalanan(
+                            tempatId = place.id,
+                            namaTempat = nama,
+                            jamMulai = jamMulai,
+                            jamSelesai = jamSelesai,
+                            gambar = place.gambar,
+                            address = place.address,
+                            deskripsi = place.deskripsi,
+                            nomorTelepon = place.phoneNumber
+                        )
                     }
                     showConfirmationDialog = false
                 },
-                selectedPlace = selectedPlaces.firstOrNull()
+                selectedPlace = selectedPlace
             )
         }
 
@@ -354,7 +350,7 @@ fun CreatePlanScreen3(navController: NavController, viewModel: planViewModel = v
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = tempat.id,
+                                text = tempat.namaLokasi.ifBlank { tempat.id },
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Blue3

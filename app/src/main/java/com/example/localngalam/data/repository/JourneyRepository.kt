@@ -40,6 +40,21 @@ class JourneyRepository(private val sessionManager: SessionManager) {
         }
     }
 
+    suspend fun getJourneyById(journeyId: String): Perjalanan? {
+        return try {
+            val response = api().getJourneyById("eq.$journeyId")
+            if (response.isSuccessful) {
+                response.body()?.firstOrNull()?.toModel()
+            } else {
+                Log.e(TAG, "getJourneyById gagal: ${response.code()} ${response.errorBody()?.string()}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getJourneyById exception: ${e.message}", e)
+            null
+        }
+    }
+
     suspend fun getAllJourneys(): List<Perjalanan> {
         val uid = sessionManager.getUserId() ?: return emptyList()
         return try {
@@ -136,8 +151,25 @@ class JourneyRepository(private val sessionManager: SessionManager) {
         return updateDaftarPerjalanan(journeyId, updatedList)
     }
 
+    suspend fun deleteJourney(journeyId: String): Boolean {
+        return try {
+            val response = api().deleteJourney("eq.$journeyId")
+            if (response.isSuccessful) {
+                Log.d(TAG, "Journey $journeyId berhasil dihapus")
+                true
+            } else {
+                Log.e(TAG, "deleteJourney gagal: ${response.code()} ${response.errorBody()?.string()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "deleteJourney exception: ${e.message}", e)
+            false
+        }
+    }
+
     private fun JourneyDto.toModel(): Perjalanan {
         return Perjalanan(
+            id = id,
             namaPerjalanan = namaPerjalanan,
             tanggalBerangkat = tanggalBerangkat,
             tanggalSelesai = tanggalSelesai,

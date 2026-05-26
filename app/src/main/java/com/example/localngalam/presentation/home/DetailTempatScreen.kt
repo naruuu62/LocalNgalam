@@ -1,7 +1,6 @@
     package com.example.localngalam.presentation.home
 
     import Tempat
-    import androidx.compose.foundation.BorderStroke
     import androidx.compose.foundation.Image
     import androidx.compose.runtime.Composable
     import com.example.localngalam.presentation.ui_component.Navbar
@@ -10,82 +9,85 @@
     import androidx.compose.foundation.layout.*
     import androidx.compose.foundation.lazy.LazyColumn
     import androidx.compose.foundation.lazy.LazyRow
+    import androidx.compose.foundation.shape.CircleShape
     import androidx.compose.foundation.shape.RoundedCornerShape
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.automirrored.filled.ArrowBack
-    import androidx.compose.material.icons.filled.ArrowBack
+    import androidx.compose.material.icons.filled.Favorite
+    import androidx.compose.material.icons.filled.FavoriteBorder
     import androidx.compose.material.icons.filled.Star
-    import androidx.compose.material3.Button
-    import androidx.compose.material3.ButtonDefaults
-    import androidx.compose.material3.ExperimentalMaterial3Api
-    import androidx.compose.material3.Icon
-    import androidx.compose.material3.IconButton
-    import androidx.compose.material3.Scaffold
-    import androidx.compose.material3.Text
-    import androidx.compose.material3.TopAppBar
-    import androidx.compose.runtime.collectAsState
-    import androidx.compose.runtime.derivedStateOf
-    import androidx.compose.runtime.getValue
-    import androidx.compose.runtime.remember
+    import androidx.compose.material3.*
+    import androidx.compose.runtime.*
     import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
     import androidx.compose.ui.draw.clip
     import androidx.compose.ui.graphics.Color
     import androidx.compose.ui.layout.ContentScale
+    import androidx.compose.ui.res.painterResource
     import androidx.compose.ui.text.font.FontStyle
     import androidx.compose.ui.text.font.FontWeight
     import androidx.compose.ui.text.style.TextAlign
-    import androidx.compose.ui.tooling.preview.Preview
     import androidx.compose.ui.unit.dp
     import androidx.compose.ui.unit.sp
+    import androidx.compose.ui.window.Dialog
+    import androidx.lifecycle.compose.collectAsStateWithLifecycle
     import androidx.lifecycle.viewmodel.compose.viewModel
     import androidx.navigation.NavController
-    import androidx.navigation.compose.rememberNavController
-    import coil.compose.rememberAsyncImagePainter
-    import com.example.localngalam.presentation.ui_component.Navbar
-    import com.example.localngalam.presentation.ui.theme.Blue
-    import com.example.localngalam.presentation.ui.theme.poppinsFont
-    import java.sql.RowId
-
-    import androidx.compose.foundation.Image
-    import androidx.compose.foundation.background
-    import androidx.compose.foundation.layout.*
-    import androidx.compose.foundation.lazy.LazyRow
-    import androidx.compose.foundation.lazy.items
-
-    import androidx.compose.material.icons.automirrored.filled.ArrowBack
-    import androidx.compose.material.icons.filled.Star
-    import androidx.compose.material3.*
-    import androidx.compose.runtime.*
-
-    import androidx.compose.ui.draw.clip
-    import androidx.compose.ui.res.painterResource
-    import androidx.compose.ui.text.font.FontWeight.Companion.Bold
-
-    import androidx.compose.ui.unit.dp
-    import androidx.compose.ui.unit.sp
-    import androidx.lifecycle.viewmodel.compose.viewModel
     import coil.compose.rememberAsyncImagePainter
     import com.example.localngalam.R
+    import com.example.localngalam.data.repository.BucketListRepository
+    import com.example.localngalam.data.repository.Review
     import com.example.localngalam.presentation.ui.theme.Blue3
     import com.example.localngalam.presentation.ui.theme.Blue4
     import com.example.localngalam.presentation.ui.theme.Green
-    import com.example.localngalam.presentation.ui_component.Navbar
     import com.example.localngalam.presentation.ui.theme.poppinsFont
+    import kotlinx.coroutines.launch
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun DetailTempatScreen(
         navController: NavController,
         sharedViewModel: sharedViewModel = viewModel(),
+        reviewViewModel: ReviewViewModel = viewModel(),
         tempat: Tempat
     ) {
+        val reviews by reviewViewModel.reviews.collectAsStateWithLifecycle()
+        val isLoadingReview by reviewViewModel.isLoading.collectAsStateWithLifecycle()
+        var showAddReviewDialog by remember { mutableStateOf(false) }
+        var isBucketListed by remember { mutableStateOf(false) }
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
+
+        // Load reviews & cek bucket list saat buka halaman
+        LaunchedEffect(tempat.id) {
+            reviewViewModel.fetchReviews(tempat.id)
+        }
+
+        val avgRating by remember {
+            derivedStateOf { reviewViewModel.averageRating() }
+        }
+
+        if (showAddReviewDialog) {
+            AddReviewDialog(
+                onDismiss = { showAddReviewDialog = false },
+                onSubmit = { rating, comment ->
+                    reviewViewModel.addReview(tempat.id, rating, comment) {
+                        showAddReviewDialog = false
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Ulasan berhasil ditambahkan!")
+                        }
+                    }
+                }
+            )
+        }
+
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 TopAppBar(
                     title = {
                         Text(
-                            text = tempat.id ?: "Detail Tempat",
+                            text = tempat.namaLokasi.ifBlank { "Detail Tempat" },
                             fontWeight = FontWeight.Bold,
                             fontFamily = poppinsFont,
                             color = Blue3
@@ -96,14 +98,34 @@
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            scope.launch {
+                                val msg = if (!isBucketListed) {
+                                    isBucketListed = true
+                                    "Tersimpan ke Bucket List!"
+                                } else {
+                                    isBucketListed = false
+                                    "Dihapus dari Bucket List"
+                                }
+                                snackbarHostState.showSnackbar(msg)
+                            }
+                        }) {
+                            Icon(
+                                imageVector = if (isBucketListed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = "Bucket List",
+                                tint = if (isBucketListed) Color.Red else Color.Gray
+                            )
+                        }
                     }
                 )
             },
             bottomBar = {
                 Navbar(
-                    onHomeClick = { navController.navigate("home") },
-                    onSearchClick = { navController.navigate("search") },
-                    onPlusClick = { navController.navigate("add_plan") },
+                    onHomeClick    = { navController.navigate("home") },
+                    onSearchClick  = { navController.navigate("search") },
+                    onPlusClick    = { navController.navigate("add_plan") },
                     onHistoryClick = { navController.navigate("history") },
                     onProfileClick = { navController.navigate("profile") }
                 )
@@ -116,53 +138,50 @@
                     .padding(paddingValues)
             ) {
                 item {
+                    // Alamat
                     Text(
-                        text = tempat?.address ?: "Alamat tidak tersedia",
+                        text = tempat.address.ifBlank { "Alamat tidak tersedia" },
                         fontStyle = FontStyle.Italic,
                         color = Color.Gray,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
+                    // Gambar utama
                     Image(
-                        painter = rememberAsyncImagePainter(
-                            model = tempat?.gambar
-                        ),
-                        contentDescription = "Tempat Image",
+                        painter = rememberAsyncImagePainter(model = tempat.gambar),
+                        contentDescription = "Gambar ${tempat.namaLokasi}",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .height(220.dp),
+                        contentScale = ContentScale.Crop
                     )
 
                     Column(modifier = Modifier.padding(16.dp)) {
+
+                        // Rating summary
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "130 reviews", fontSize = 14.sp, color = Color.Gray)
+                            val ratingNow = if (reviews.isEmpty()) 0f else reviews.map { it.rating }.average().toFloat()
+                            Text(text = "${reviews.size} ulasan", fontSize = 14.sp, color = Color.Gray)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "4.6",
+                                text = if (ratingNow > 0) "%.1f".format(ratingNow) else "-",
                                 fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
+                                fontWeight = FontWeight.Bold
                             )
-                            Icon(
-                                Icons.Filled.Star,
-                                contentDescription = "Rating",
-                                tint = Color.Yellow
-                            )
+                            Icon(Icons.Filled.Star, contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(18.dp))
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        if (!tempat?.tags.isNullOrEmpty()) {
+                        // Tags
+                        if (tempat.tags.isNotEmpty()) {
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                items(tempat?.tags ?: emptyList()) { tag ->
+                                items(tempat.tags.size) { i ->
                                     Text(
-                                        text = tag,
+                                        text = tempat.tags[i],
                                         modifier = Modifier
                                             .background(Blue4, RoundedCornerShape(12.dp))
-                                            .padding(8.dp),
+                                            .padding(horizontal = 10.dp, vertical = 4.dp),
                                         fontSize = 12.sp,
                                         fontFamily = poppinsFont
                                     )
@@ -172,113 +191,80 @@
 
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        // Tentang
+                        Text("Tentang", fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = poppinsFont, color = Blue3)
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Tentang",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = poppinsFont,
-                            color = Blue3
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = tempat?.deskripsi ?: "Deskripsi tidak tersedia",
+                            text = tempat.deskripsi.ifBlank { "Deskripsi tidak tersedia" },
                             fontSize = 14.sp
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Text(
-                            text = "Jam Operasional",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = poppinsFont,
-                            color = Blue3
-                        )
-                        Column(
+                        // Jam operasional
+                        Text("Jam Operasional", fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = poppinsFont, color = Blue3)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Blue4.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                                .padding(10.dp)
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            val jamOperasional = mapOf(
-                                "Minggu" to "10.00 - 22.00",
-                                "Senin" to "11.00 - 21.00",
-                                "Selasa" to "10.00 - 22.00",
-                                "Rabu" to "10.00 - 22.00",
-                                "Kamis" to "10.00 - 22.00",
-                                "Jumat" to "11.00 - 21.00",
-                                "Sabtu" to "11.00 - 21.00"
+                            Text(text = "Buka", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                text = if (tempat.open.isNotBlank() && tempat.close.isNotBlank())
+                                    "${tempat.open} – ${tempat.close}"
+                                else "Setiap hari",
+                                fontSize = 14.sp
                             )
-                            jamOperasional.forEach { (hari, jam) ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(text = hari, fontSize = 14.sp)
-                                    Text(
-                                        text = jam,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                }
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Ulasan section
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Ulasan", fontFamily = poppinsFont, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Blue3)
+                            TextButton(onClick = { showAddReviewDialog = true }) {
+                                Text("+ Tambah", color = Blue3, fontSize = 13.sp)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        if (isLoadingReview) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                        } else if (reviews.isEmpty()) {
+                            Text(
+                                "Belum ada ulasan. Jadilah yang pertama!",
+                                color = Color.Gray,
+                                fontSize = 13.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        } else {
+                            reviews.forEach { review ->
+                                ReviewCard(review = review)
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Text(
-                            text = "Ulasan",
-                            fontFamily = poppinsFont,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = Blue3
-                        )
-
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            item {
-                                Card(
-                                    title = "Lezat dan Terjangkau!",
-                                    username = "foodie_malang",
-                                    rating = 5,
-                                    content = "Makanannya enak, porsinya pas, dan harganya ramah di kantong. Cocok buat nongkrong santai!"
-                                )
-                            }
-                            item {
-                                Card(
-                                    title = "Mie Pedasnya Mantap!",
-                                    username = "spicylover",
-                                    rating = 4,
-                                    content = "Mie pedas spesialnya benar-benar nendang, bikin ketagihan buat datang lagi!"
-                                )
-                            }
-                            item {
-                                Card(
-                                    title = "Tempat Cozy",
-                                    username = "traveladdict",
-                                    rating = 5,
-                                    content = "Tempatnya nyaman, suasana asik, cocok buat kerja atau sekadar ngopi santai."
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
+                        // Tombol Tambah Ulasan
                         Button(
-                            onClick = { /* Tambahkan ulasan */ },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
+                            onClick = { showAddReviewDialog = true },
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Green)
                         ) {
-                            Text(
-                                text = "Tambahkan Ulasan", color = Color.White, fontSize = 12.sp
-                            )
+                            Text("Tambahkan Ulasan", color = Color.White, fontSize = 14.sp)
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
@@ -286,10 +272,146 @@
     }
 
     @Composable
+    fun ReviewCard(review: Review) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Column(modifier = Modifier.padding(14.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Avatar placeholder
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(Blue4),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = review.userName.firstOrNull()?.uppercaseChar()?.toString() ?: "U",
+                            fontWeight = FontWeight.Bold,
+                            color = Blue3,
+                            fontSize = 16.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(text = review.userName.ifBlank { "Pengguna" }, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                        Row {
+                            repeat(5) { i ->
+                                Icon(
+                                    Icons.Filled.Star,
+                                    contentDescription = null,
+                                    tint = if (i < review.rating) Color(0xFFFFC107) else Color.LightGray,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = review.createdAt.take(10),
+                        fontSize = 11.sp,
+                        color = Color.Gray
+                    )
+                }
+                if (review.comment.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = review.comment, fontSize = 13.sp, color = Color.DarkGray)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun AddReviewDialog(
+        onDismiss: () -> Unit,
+        onSubmit: (Int, String) -> Unit
+    ) {
+        var rating by remember { mutableIntStateOf(5) }
+        var comment by remember { mutableStateOf("") }
+
+        Dialog(onDismissRequest = onDismiss) {
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(Color.White)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Tulis Ulasan",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        fontFamily = poppinsFont,
+                        color = Blue3
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Pilih rating bintang
+                    Text("Rating", fontSize = 14.sp, color = Color.Gray)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row {
+                        (1..5).forEach { star ->
+                            IconButton(onClick = { rating = star }) {
+                                Icon(
+                                    Icons.Filled.Star,
+                                    contentDescription = "$star bintang",
+                                    tint = if (star <= rating) Color(0xFFFFC107) else Color.LightGray,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = comment,
+                        onValueChange = { comment = it },
+                        label = { Text("Tulis komentar...") },
+                        modifier = Modifier.fillMaxWidth().height(120.dp),
+                        maxLines = 5,
+                        shape = RoundedCornerShape(10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = onDismiss,
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Batal")
+                        }
+                        Button(
+                            onClick = { onSubmit(rating, comment) },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = Green),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Kirim", color = Color.White)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Legacy composable kept for compatibility (unused)
+    @Composable
     fun Card(title: String, username: String, rating: Int, content: String) {
         Card(
             modifier = Modifier
-                .width(300.dp) // Sesuaikan lebar card
+                .width(300.dp)
                 .padding(8.dp),
             colors = CardDefaults.cardColors(Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -305,7 +427,7 @@
                         Icon(
                             Icons.Filled.Star,
                             contentDescription = "Rating",
-                            tint = if (i <= rating) Color.Yellow else Color.Gray,
+                            tint = if (i <= rating) Color(0xFFFFC107) else Color.LightGray,
                             modifier = Modifier.size(16.dp)
                         )
                     }

@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 
 import androidx.navigation.compose.composable
+import com.example.localngalam.presentation.bucketlist.BucketListScreen
 import com.example.localngalam.presentation.history.HistoryScreen
 import com.example.localngalam.presentation.profile.ProfileScreen
 
@@ -48,6 +49,7 @@ fun MainScreen(navController: NavHostController) {
         composable("add_plan") { CreatePlanScreen1(navController) }
         composable("create_plan_2") { CreatePlanScreen2(navController) }
         composable("create_plan_3") { CreatePlanScreen3(navController)}
+        composable("bucket_list") { BucketListScreen(navController) }
         composable("detail_tempat") {
             navController.previousBackStackEntry?.savedStateHandle?.get<Tempat>("tempat")
                 ?.let {

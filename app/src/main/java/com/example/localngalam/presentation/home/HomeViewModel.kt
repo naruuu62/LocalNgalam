@@ -15,9 +15,13 @@ class homeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val sessionManager = SessionManager(application)
     private val tempatRepository = TempatRepository(sessionManager)
+    private val userRepository = com.example.localngalam.data.repository.UserRepository(sessionManager)
 
     private val _tempatPerKategori = MutableStateFlow<Map<String, List<Tempat>>>(emptyMap())
     val tempatPerKategori: StateFlow<Map<String, List<Tempat>>> get() = _tempatPerKategori
+    
+    private val _userData = MutableStateFlow<com.example.localngalam.model.UserData?>(null)
+    val userData: StateFlow<com.example.localngalam.model.UserData?> get() = _userData
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -26,6 +30,17 @@ class homeViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         getTempatPerKategori()
+        fetchUserData()
+    }
+
+    private fun fetchUserData() {
+        val uid = sessionManager.getUserId()
+        if (uid != null) {
+            viewModelScope.launch {
+                val user = userRepository.getUserById(uid)
+                _userData.value = user
+            }
+        }
     }
 
     fun getTempatPerKategori() {
