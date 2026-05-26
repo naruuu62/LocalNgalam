@@ -20,14 +20,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-/**
- * Retrofit interface for all Supabase API calls.
- * Auth endpoints use Supabase GoTrue (auth/v1/*).
- * Data endpoints use PostgREST (rest/v1/*).
- *
- * NOTE: Retrofit does not support default parameter values in interface methods.
- * Default values (grant_type, select, etc.) are specified at the call site in repositories.
- */
+
 interface SupabaseApiService {
 
     // AUTH

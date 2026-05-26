@@ -152,7 +152,7 @@ fun TempatItem(tempat: Tempat, onClick: (() -> Unit)?= null) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = tempat.id,
+                text = tempat.namaLokasi,
                 fontSize = 16.sp,
                 fontFamily = poppinsFont,
                 fontWeight = FontWeight.SemiBold,

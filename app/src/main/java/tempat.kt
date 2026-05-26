@@ -22,6 +22,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class Tempat(
     var id: String = "",
+    val namaLokasi: String = "",
     val address: String = "",
     val category: String = "",
     var close: String = "",
@@ -33,8 +34,7 @@ data class Tempat(
     val gambar: String = "",
     val daftarPerjalanan: List<tempatPerjalanan> = emptyList()
 
-    ) : Parcelable
-
+) : Parcelable
 @Composable
 fun tempatScreen(navController: NavController, viewModel: planViewModel = viewModel()) {
     val tempatList by viewModel.tempatList.collectAsStateWithLifecycle()

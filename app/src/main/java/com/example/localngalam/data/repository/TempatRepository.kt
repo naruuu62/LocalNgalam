@@ -56,15 +56,16 @@ class TempatRepository(private val sessionManager: SessionManager) {
     private fun TempatDto.toModel(): Tempat {
         return Tempat(
             id = id,
-            address = address,
-            category = category,
-            close = close,
-            deskripsi = deskripsi,
-            open = open,
-            phoneNumber = phoneNumber,
-            priceRange = priceRange.toLong(),
-            tags = tags.map { getTagNilai(it.toLong()) },
-            gambar = gambar
+            namaLokasi = namaLokasi ?: "",
+            address = address ?: "",
+            category = category ?: "",
+            close = close ?: "",
+            deskripsi = deskripsi ?: "",
+            open = open ?: "",
+            phoneNumber = phoneNumber ?: "",
+            priceRange = priceRange?.toLong() ?: 0L,
+            tags = tags?.map { getTagNilai(it.toLong()) } ?: emptyList(),
+            gambar = gambar ?: ""
         )
     }
 
