@@ -102,9 +102,12 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier, 
                 .align(Alignment.TopCenter)
                 .padding(top = 90.dp)
         )
-        Image(
-            painter = painterResource(id = R.drawable.localngalam),
-            contentDescription = "",
+        Text(
+            text = "DolanNgalam",
+            fontFamily = poppinsFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp,
+            color = Color.White,
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 170.dp)
