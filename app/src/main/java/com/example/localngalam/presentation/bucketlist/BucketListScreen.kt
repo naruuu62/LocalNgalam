@@ -1,5 +1,6 @@
 package com.example.localngalam.presentation.bucketlist
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,6 +36,7 @@ fun BucketListScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val destinationNames by viewModel.destinationNames.collectAsStateWithLifecycle()
     val destinationImages by viewModel.destinationImages.collectAsStateWithLifecycle()
+    val destinationTempat by viewModel.destinationTempat.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -112,12 +114,20 @@ fun BucketListScreen(
                         items(bucketList, key = { it.id }) { item ->
                             val nama = destinationNames[item.destinationId] ?: item.destinationId
                             val gambar = destinationImages[item.destinationId] ?: ""
+                            val tempat = destinationTempat[item.destinationId]
 
                             Card(
                                 shape = RoundedCornerShape(14.dp),
                                 colors = CardDefaults.cardColors(Color.White),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable(enabled = tempat != null) {
+                                        tempat?.let {
+                                            navController.currentBackStackEntry?.savedStateHandle?.set("tempat", it)
+                                            navController.navigate("detail_tempat")
+                                        }
+                                    }
                             ) {
                                 Row(
                                     modifier = Modifier.padding(12.dp),

@@ -123,7 +123,12 @@ private fun JourneyCard(
     val statusUI = getJourneyStatusUI(journey.tanggalBerangkat, journey.tanggalSelesai)
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navController.currentBackStackEntry?.savedStateHandle?.set("journey", journey)
+                navController.navigate("detail_itinerary")
+            },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)

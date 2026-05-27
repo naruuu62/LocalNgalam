@@ -18,6 +18,8 @@ import com.example.localngalam.presentation.createPlan.CreatePlanScreen1
 import com.example.localngalam.presentation.createPlan.CreatePlanScreen2
 import com.example.localngalam.presentation.createPlan.CreatePlanScreen3
 import com.example.localngalam.presentation.home.DetailTempatScreen
+import com.example.localngalam.presentation.history.DetailItineraryScreen
+import com.example.localngalam.model.Perjalanan
 import com.example.localngalam.presentation.home.HomeScreen
 import com.example.localngalam.presentation.login.LoginScreen
 import com.example.localngalam.presentation.register.RegisterScreen
@@ -59,6 +61,12 @@ fun MainScreen(navController: NavHostController, sessionManager: SessionManager)
                     DetailTempatScreen(navController, tempat = it)
                 }
              }
+        composable("detail_itinerary") {
+            navController.previousBackStackEntry?.savedStateHandle?.get<Perjalanan>("journey")
+                ?.let {
+                    DetailItineraryScreen(navController, journey = it)
+                }
+        }
 
         }
     }

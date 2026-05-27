@@ -62,4 +62,20 @@ class UserRepository(private val sessionManager: SessionManager) {
             false
         }
     }
+
+    suspend fun updateUserFields(uid: String, fields: Map<String, Any?>): Boolean {
+        return try {
+            val response = api().updateUser(uid = "eq.$uid", update = fields)
+            if (response.isSuccessful) {
+                Log.d(TAG, "User berhasil diupdate: $uid")
+                true
+            } else {
+                Log.e(TAG, "updateUserFields gagal: ${response.code()} ${response.errorBody()?.string()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "updateUserFields exception: ${e.message}", e)
+            false
+        }
+    }
 }

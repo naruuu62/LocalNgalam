@@ -69,6 +69,13 @@ interface SupabaseApiService {
     @POST("rest/v1/users")
     suspend fun upsertUser(@Body user: UpsertUserRequest): Response<Unit>
 
+    @Headers("Prefer: return=representation")
+    @PATCH("rest/v1/users")
+    suspend fun updateUser(
+        @Query("uid") uid: String,
+        @Body update: Map<String, @JvmSuppressWildcards Any?>
+    ): Response<List<UserDto>>
+
     // TEMPAT
 
     @GET("rest/v1/tempat")
@@ -133,11 +140,12 @@ interface SupabaseApiService {
     @POST("rest/v1/reviews")
     suspend fun addReview(@Body review: CreateReviewRequest): Response<List<ReviewDto>>
 
+    @Headers("Prefer: return=representation")
     @PATCH("rest/v1/reviews")
     suspend fun updateReview(
         @Query("id") reviewId: String,
         @Body update: UpdateReviewRequest
-    ): Response<Unit>
+    ): Response<List<ReviewDto>>
 
     @DELETE("rest/v1/reviews")
     suspend fun deleteReview(@Query("id") reviewId: String): Response<Unit>

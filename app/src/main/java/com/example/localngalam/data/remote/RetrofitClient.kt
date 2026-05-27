@@ -24,16 +24,21 @@ object RetrofitClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor { chain ->
-                val requestBuilder = chain.request().newBuilder()
-                    .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                    .addHeader("Content-Type", "application/json")
+                val originalRequest = chain.request()
+                val requestBuilder = originalRequest.newBuilder()
+                    .header("apikey", SupabaseConfig.ANON_KEY)
+
+                // Only add Content-Type: application/json if not a storage upload/download request
+                if (!originalRequest.url.encodedPath.contains("/storage/")) {
+                    requestBuilder.header("Content-Type", "application/json")
+                }
 
                 // If an access token is supplied, add Authorization header
                 if (!accessToken.isNullOrBlank()) {
-                    requestBuilder.addHeader("Authorization", "Bearer $accessToken")
+                    requestBuilder.header("Authorization", "Bearer $accessToken")
                 } else {
                     // Unauthenticated: use anon key as Bearer for auth endpoints
-                    requestBuilder.addHeader("Authorization", "Bearer ${SupabaseConfig.ANON_KEY}")
+                    requestBuilder.header("Authorization", "Bearer ${SupabaseConfig.ANON_KEY}")
                 }
 
                 chain.proceed(requestBuilder.build())

@@ -68,9 +68,13 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         val current = _userData.value ?: return
         viewModelScope.launch {
             _isLoading.value = true
-            val updated = current.copy(namaLengkap = namaLengkap, bio = bio)
-            val success = userRepository.upsertUser(updated)
+            val fields = mapOf(
+                "nama_lengkap" to namaLengkap,
+                "bio" to bio
+            )
+            val success = userRepository.updateUserFields(current.uid, fields)
             if (success) {
+                val updated = current.copy(namaLengkap = namaLengkap, bio = bio)
                 _userData.value = updated
                 sessionManager.saveUserName(namaLengkap)
                 _updateSuccess.value = true
@@ -107,9 +111,12 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     val publicUrl = "$baseUrl/storage/v1/object/public/avatars/$filename"
 
                     // Update user record with new avatar URL
-                    val updated = current.copy(fotoProfil = publicUrl)
-                    val upsertSuccess = userRepository.upsertUser(updated)
+                    val fields = mapOf(
+                        "foto_profil" to publicUrl
+                    )
+                    val upsertSuccess = userRepository.updateUserFields(current.uid, fields)
                     if (upsertSuccess) {
+                        val updated = current.copy(fotoProfil = publicUrl)
                         _userData.value = updated
                         onSuccess()
                     }

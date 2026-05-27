@@ -8,6 +8,7 @@ import com.example.localngalam.data.local.SessionManager
 import com.example.localngalam.data.repository.BucketListItem
 import com.example.localngalam.data.repository.BucketListRepository
 import com.example.localngalam.data.repository.TempatRepository
+import Tempat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -31,6 +32,9 @@ class BucketListViewModel(application: Application) : AndroidViewModel(applicati
     private val _destinationImages = MutableStateFlow<Map<String, String>>(emptyMap())
     val destinationImages: StateFlow<Map<String, String>> = _destinationImages
 
+    private val _destinationTempat = MutableStateFlow<Map<String, Tempat>>(emptyMap())
+    val destinationTempat: StateFlow<Map<String, Tempat>> = _destinationTempat
+
     init {
         fetchBucketList()
     }
@@ -43,15 +47,18 @@ class BucketListViewModel(application: Application) : AndroidViewModel(applicati
             // Load detail setiap destination dari TempatRepository
             val namesMap = mutableMapOf<String, String>()
             val imagesMap = mutableMapOf<String, String>()
+            val tempatMap = mutableMapOf<String, Tempat>()
             list.forEach { item ->
                 val tempat = tempatRepository.getTempatById(item.destinationId)
                 if (tempat != null) {
                     namesMap[item.destinationId] = tempat.namaLokasi.ifBlank { tempat.id }
                     imagesMap[item.destinationId] = tempat.gambar
+                    tempatMap[item.destinationId] = tempat
                 }
             }
             _destinationNames.value = namesMap
             _destinationImages.value = imagesMap
+            _destinationTempat.value = tempatMap
             _isLoading.value = false
         }
     }
