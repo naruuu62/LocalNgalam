@@ -119,9 +119,16 @@ class planViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         viewModelScope.launch {
-            // Re-fetch journey to get current daftarPerjalanan, then update tipe only
-            // For now we patch by creating a new journey update — or simply call getJourney + updateDaftar
-            Log.d("planViewModel", "Update tipe perjalanan: $tipePerjalanan")
+            val success = journeyRepository.updateTipePerjalanan(journeyId, tipePerjalanan)
+            if (success) {
+                Log.d("planViewModel", "Update tipe perjalanan berhasil: $tipePerjalanan")
+                val current = _journeyData.value
+                if (current != null) {
+                    _journeyData.value = current.copy(tipePerjalanan = tipePerjalanan)
+                }
+            } else {
+                Log.e("planViewModel", "Update tipe perjalanan gagal: $tipePerjalanan")
+            }
         }
     }
 

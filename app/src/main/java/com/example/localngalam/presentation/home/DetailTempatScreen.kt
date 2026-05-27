@@ -13,6 +13,8 @@
     import androidx.compose.foundation.shape.RoundedCornerShape
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.automirrored.filled.ArrowBack
+    import androidx.compose.material.icons.filled.Delete
+    import androidx.compose.material.icons.filled.Edit
     import androidx.compose.material.icons.filled.Favorite
     import androidx.compose.material.icons.filled.FavoriteBorder
     import androidx.compose.material.icons.filled.Star
@@ -23,6 +25,7 @@
     import androidx.compose.ui.draw.clip
     import androidx.compose.ui.graphics.Color
     import androidx.compose.ui.layout.ContentScale
+    import androidx.compose.ui.platform.LocalContext
     import androidx.compose.ui.res.painterResource
     import androidx.compose.ui.text.font.FontStyle
     import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +38,7 @@
     import androidx.navigation.NavController
     import coil.compose.rememberAsyncImagePainter
     import com.example.localngalam.R
+    import com.example.localngalam.data.local.SessionManager
     import com.example.localngalam.data.repository.BucketListRepository
     import com.example.localngalam.data.repository.Review
     import com.example.localngalam.presentation.ui.theme.Blue3
@@ -54,19 +58,29 @@
         val reviews by reviewViewModel.reviews.collectAsStateWithLifecycle()
         val isLoadingReview by reviewViewModel.isLoading.collectAsStateWithLifecycle()
         var showAddReviewDialog by remember { mutableStateOf(false) }
+        var showEditReviewDialog by remember { mutableStateOf(false) }
+        var editingReview by remember { mutableStateOf<Review?>(null) }
         var isBucketListed by remember { mutableStateOf(false) }
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
 
+        // Bucket List Repository
+        val context = LocalContext.current
+        val sessionManager = remember { SessionManager(context) }
+        val bucketListRepository = remember { BucketListRepository(sessionManager) }
+
         // Load reviews & cek bucket list saat buka halaman
         LaunchedEffect(tempat.id) {
             reviewViewModel.fetchReviews(tempat.id)
+            // Cek apakah tempat ini sudah ada di bucket list
+            isBucketListed = bucketListRepository.isInBucketList(tempat.id)
         }
 
         val avgRating by remember {
             derivedStateOf { reviewViewModel.averageRating() }
         }
 
+        // Dialog Tambah Ulasan
         if (showAddReviewDialog) {
             AddReviewDialog(
                 onDismiss = { showAddReviewDialog = false },
@@ -78,6 +92,33 @@
                         }
                     }
                 }
+            )
+        }
+
+        // Dialog Edit Ulasan
+        if (showEditReviewDialog && editingReview != null) {
+            AddReviewDialog(
+                onDismiss = {
+                    showEditReviewDialog = false
+                    editingReview = null
+                },
+                onSubmit = { rating, comment ->
+                    reviewViewModel.updateReview(
+                        reviewId = editingReview!!.id,
+                        destinationId = tempat.id,
+                        rating = rating,
+                        comment = comment
+                    ) {
+                        showEditReviewDialog = false
+                        editingReview = null
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Ulasan berhasil diperbarui!")
+                        }
+                    }
+                },
+                initialRating = editingReview!!.rating,
+                initialComment = editingReview!!.comment,
+                dialogTitle = "Edit Ulasan"
             )
         }
 
@@ -102,14 +143,23 @@
                     actions = {
                         IconButton(onClick = {
                             scope.launch {
-                                val msg = if (!isBucketListed) {
-                                    isBucketListed = true
-                                    "Tersimpan ke Bucket List!"
+                                if (!isBucketListed) {
+                                    val success = bucketListRepository.addToBucketList(tempat.id)
+                                    if (success) {
+                                        isBucketListed = true
+                                        snackbarHostState.showSnackbar("Tersimpan ke Bucket List!")
+                                    } else {
+                                        snackbarHostState.showSnackbar("Gagal menyimpan ke Bucket List")
+                                    }
                                 } else {
-                                    isBucketListed = false
-                                    "Dihapus dari Bucket List"
+                                    val success = bucketListRepository.deleteFromBucketList(tempat.id)
+                                    if (success) {
+                                        isBucketListed = false
+                                        snackbarHostState.showSnackbar("Dihapus dari Bucket List")
+                                    } else {
+                                        snackbarHostState.showSnackbar("Gagal menghapus dari Bucket List")
+                                    }
                                 }
-                                snackbarHostState.showSnackbar(msg)
                             }
                         }) {
                             Icon(
@@ -248,7 +298,20 @@
                             )
                         } else {
                             reviews.forEach { review ->
-                                ReviewCard(review = review)
+                                ReviewCard(
+                                    review = review,
+                                    currentUserId = reviewViewModel.currentUserId,
+                                    onEdit = {
+                                        editingReview = review
+                                        showEditReviewDialog = true
+                                    },
+                                    onDelete = {
+                                        reviewViewModel.deleteReview(review.id, tempat.id)
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Ulasan berhasil dihapus")
+                                        }
+                                    }
+                                )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
@@ -272,7 +335,14 @@
     }
 
     @Composable
-    fun ReviewCard(review: Review) {
+    fun ReviewCard(
+        review: Review,
+        currentUserId: String? = null,
+        onEdit: (() -> Unit)? = null,
+        onDelete: (() -> Unit)? = null
+    ) {
+        val isOwner = currentUserId != null && review.userId == currentUserId
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(Color.White),
@@ -297,7 +367,7 @@
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(text = review.userName.ifBlank { "Pengguna" }, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                         Row {
                             repeat(5) { i ->
@@ -310,16 +380,43 @@
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = review.createdAt.take(10),
                         fontSize = 11.sp,
                         color = Color.Gray
                     )
                 }
+
                 if (review.comment.isNotBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = review.comment, fontSize = 13.sp, color = Color.DarkGray)
+                }
+
+                // Tombol Edit & Hapus (hanya untuk review milik user sendiri)
+                if (isOwner) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(onClick = { onEdit?.invoke() }, modifier = Modifier.size(32.dp)) {
+                            Icon(
+                                Icons.Filled.Edit,
+                                contentDescription = "Edit Ulasan",
+                                tint = Blue3,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        IconButton(onClick = { onDelete?.invoke() }, modifier = Modifier.size(32.dp)) {
+                            Icon(
+                                Icons.Filled.Delete,
+                                contentDescription = "Hapus Ulasan",
+                                tint = Color.Red.copy(alpha = 0.7f),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -328,10 +425,13 @@
     @Composable
     fun AddReviewDialog(
         onDismiss: () -> Unit,
-        onSubmit: (Int, String) -> Unit
+        onSubmit: (Int, String) -> Unit,
+        initialRating: Int = 5,
+        initialComment: String = "",
+        dialogTitle: String = "Tulis Ulasan"
     ) {
-        var rating by remember { mutableIntStateOf(5) }
-        var comment by remember { mutableStateOf("") }
+        var rating by remember { mutableIntStateOf(initialRating) }
+        var comment by remember { mutableStateOf(initialComment) }
 
         Dialog(onDismissRequest = onDismiss) {
             Card(
@@ -343,7 +443,7 @@
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "Tulis Ulasan",
+                        dialogTitle,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         fontFamily = poppinsFont,

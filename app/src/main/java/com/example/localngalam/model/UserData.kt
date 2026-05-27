@@ -9,5 +9,6 @@ data class UserData(
     val noTelepon: String = "",
     val email: String = "",
     val uid: String = "",
-    val fotoProfil: String? = null
+    val fotoProfil: String? = null,
+    val bio: String? = null
 )

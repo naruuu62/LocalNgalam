@@ -46,6 +46,10 @@ data class UpdateDaftarPerjalananRequest(
     @SerializedName("daftar_perjalanan") val daftarPerjalanan: List<TempatPerjalananDto>
 )
 
+data class UpdateTipePerjalananRequest(
+    @SerializedName("tipe_perjalanan") val tipePerjalanan: String
+)
+
 // ─── Mapper extensions ─────────────────────────────────────────────────────
 
 fun TempatPerjalananDto.toModel(): tempatPerjalanan = tempatPerjalanan(

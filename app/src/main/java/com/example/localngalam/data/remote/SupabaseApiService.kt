@@ -13,6 +13,8 @@ import com.example.localngalam.data.remote.dto.ResetPasswordRequest
 import com.example.localngalam.data.remote.dto.ReviewDto
 import com.example.localngalam.data.remote.dto.TempatDto
 import com.example.localngalam.data.remote.dto.UpdateDaftarPerjalananRequest
+import com.example.localngalam.data.remote.dto.UpdateReviewRequest
+import com.example.localngalam.data.remote.dto.UpdateTipePerjalananRequest
 import com.example.localngalam.data.remote.dto.UpsertUserRequest
 import com.example.localngalam.data.remote.dto.UserDto
 import retrofit2.Response
@@ -108,6 +110,13 @@ interface SupabaseApiService {
         @Body update: UpdateDaftarPerjalananRequest
     ): Response<List<JourneyDto>>
 
+    @Headers("Prefer: return=representation")
+    @PATCH("rest/v1/journey")
+    suspend fun updateJourneyType(
+        @Query("id") journeyId: String,
+        @Body update: UpdateTipePerjalananRequest
+    ): Response<List<JourneyDto>>
+
     @DELETE("rest/v1/journey")
     suspend fun deleteJourney(@Query("id") journeyId: String): Response<Unit>
 
@@ -124,6 +133,12 @@ interface SupabaseApiService {
     @POST("rest/v1/reviews")
     suspend fun addReview(@Body review: CreateReviewRequest): Response<List<ReviewDto>>
 
+    @PATCH("rest/v1/reviews")
+    suspend fun updateReview(
+        @Query("id") reviewId: String,
+        @Body update: UpdateReviewRequest
+    ): Response<Unit>
+
     @DELETE("rest/v1/reviews")
     suspend fun deleteReview(@Query("id") reviewId: String): Response<Unit>
 
@@ -132,6 +147,13 @@ interface SupabaseApiService {
     @GET("rest/v1/bucket_list")
     suspend fun getBucketList(
         @Query("user_id") userId: String,
+        @Query("select") select: String
+    ): Response<List<BucketListDto>>
+
+    @GET("rest/v1/bucket_list")
+    suspend fun getBucketListByDestination(
+        @Query("user_id") userId: String,
+        @Query("destination_id") destinationId: String,
         @Query("select") select: String
     ): Response<List<BucketListDto>>
 

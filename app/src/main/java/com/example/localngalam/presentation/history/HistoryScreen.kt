@@ -193,18 +193,23 @@ private fun JourneyCard(
                                 fontSize = 14.sp
                             )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Rp. 100.000,00", // Hardcoded mock
-                                fontSize = 12.sp,
-                                fontFamily = poppinsFont,
-                                color = Color.DarkGray
-                            )
-                            Text(
-                                text = "5 pax", // Hardcoded mock
-                                fontSize = 12.sp,
-                                fontFamily = poppinsFont,
-                                color = Color.Gray
-                            )
+                            if (place.jamMulai.isNotBlank() && place.jamSelesai.isNotBlank()) {
+                                Text(
+                                    text = "🕐 ${place.jamMulai} - ${place.jamSelesai}",
+                                    fontSize = 12.sp,
+                                    fontFamily = poppinsFont,
+                                    color = Color.DarkGray
+                                )
+                            }
+                            if (place.address.isNotBlank()) {
+                                Text(
+                                    text = place.address,
+                                    fontSize = 12.sp,
+                                    fontFamily = poppinsFont,
+                                    color = Color.Gray,
+                                    maxLines = 1
+                                )
+                            }
                             
                             Spacer(modifier = Modifier.height(8.dp))
                             

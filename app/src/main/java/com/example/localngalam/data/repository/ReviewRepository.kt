@@ -5,6 +5,7 @@ import com.example.localngalam.data.local.SessionManager
 import com.example.localngalam.data.remote.RetrofitClient
 import com.example.localngalam.data.remote.dto.CreateReviewRequest
 import com.example.localngalam.data.remote.dto.ReviewDto
+import com.example.localngalam.data.remote.dto.UpdateReviewRequest
 
 private const val TAG = "ReviewRepository"
 
@@ -68,6 +69,23 @@ class ReviewRepository(private val sessionManager: SessionManager) {
             }
         } catch (e: Exception) {
             Log.e(TAG, "addReview exception: ${e.message}", e)
+            false
+        }
+    }
+
+    suspend fun updateReview(reviewId: String, rating: Int, comment: String): Boolean {
+        return try {
+            val request = UpdateReviewRequest(rating = rating, comment = comment)
+            val response = api().updateReview(reviewId = "eq.$reviewId", update = request)
+            if (response.isSuccessful) {
+                Log.d(TAG, "Ulasan berhasil diupdate: $reviewId")
+                true
+            } else {
+                Log.e(TAG, "updateReview gagal: ${response.code()} ${response.errorBody()?.string()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "updateReview exception: ${e.message}", e)
             false
         }
     }

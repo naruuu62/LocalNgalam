@@ -71,6 +71,7 @@ fun CreatePlanScreen3(navController: NavController, viewModel: planViewModel = v
     val tagListState = remember { mutableStateOf<List<Long>>(emptyList()) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
     val tempatPerjalanan by viewModel.tempatList.collectAsState(initial = emptyList())
+    val namaPerjalanan by viewModel.namaPerjalanan.collectAsState()
 
     // Set journeyId ke ViewModel agar bisa update daftar perjalanan
     LaunchedEffect(journeyId) {
@@ -99,7 +100,7 @@ fun CreatePlanScreen3(navController: NavController, viewModel: planViewModel = v
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Text(
-                text = "Malang Trip",
+                text = namaPerjalanan ?: "Rencana Trip",
                 fontSize = 16.sp,
                 fontFamily = poppinsFont,
                 fontWeight = FontWeight.Bold,
@@ -108,7 +109,7 @@ fun CreatePlanScreen3(navController: NavController, viewModel: planViewModel = v
             )
 
             Text(
-                text = "3 of 4",
+                text = "3 dari 3",
                 fontSize = 12.sp,
                 fontFamily = poppinsFont,
                 fontWeight = FontWeight.SemiBold,

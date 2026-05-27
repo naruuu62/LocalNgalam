@@ -11,7 +11,8 @@ data class UserDto(
     @SerializedName("nama_lengkap") val namaLengkap: String = "",
     @SerializedName("no_telepon") val noTelepon: String = "",
     @SerializedName("email") val email: String = "",
-    @SerializedName("foto_profil") val fotoProfil: String? = null
+    @SerializedName("foto_profil") val fotoProfil: String? = null,
+    @SerializedName("bio") val bio: String? = null
 )
 
 /**
@@ -22,5 +23,6 @@ data class UpsertUserRequest(
     @SerializedName("nama_lengkap") val namaLengkap: String,
     @SerializedName("no_telepon") val noTelepon: String,
     @SerializedName("email") val email: String,
-    @SerializedName("foto_profil") val fotoProfil: String? = null
+    @SerializedName("foto_profil") val fotoProfil: String? = null,
+    @SerializedName("bio") val bio: String? = null
 )

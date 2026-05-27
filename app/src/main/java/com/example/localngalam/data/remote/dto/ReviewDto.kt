@@ -19,3 +19,8 @@ data class CreateReviewRequest(
     @SerializedName("rating") val rating: Int,
     @SerializedName("comment") val comment: String
 )
+
+data class UpdateReviewRequest(
+    @SerializedName("rating") val rating: Int,
+    @SerializedName("comment") val comment: String
+)

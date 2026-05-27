@@ -6,6 +6,7 @@ import com.example.localngalam.data.remote.RetrofitClient
 import com.example.localngalam.data.remote.dto.CreateJourneyRequest
 import com.example.localngalam.data.remote.dto.JourneyDto
 import com.example.localngalam.data.remote.dto.UpdateDaftarPerjalananRequest
+import com.example.localngalam.data.remote.dto.UpdateTipePerjalananRequest
 import com.example.localngalam.data.remote.dto.toDto
 import com.example.localngalam.data.remote.dto.toModel
 import com.example.localngalam.model.Perjalanan
@@ -125,6 +126,25 @@ class JourneyRepository(private val sessionManager: SessionManager) {
             }
         } catch (e: Exception) {
             Log.e(TAG, "updateDaftarPerjalanan exception: ${e.message}", e)
+            false
+        }
+    }
+
+    suspend fun updateTipePerjalanan(journeyId: String, tipePerjalanan: String): Boolean {
+        return try {
+            val response = api().updateJourneyType(
+                journeyId = "eq.$journeyId",
+                update = UpdateTipePerjalananRequest(tipePerjalanan = tipePerjalanan)
+            )
+            if (response.isSuccessful) {
+                Log.d(TAG, "tipePerjalanan diperbarui untuk journey: $journeyId")
+                true
+            } else {
+                Log.e(TAG, "updateTipePerjalanan gagal: ${response.code()} ${response.errorBody()?.string()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "updateTipePerjalanan exception: ${e.message}", e)
             false
         }
     }

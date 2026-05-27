@@ -25,13 +25,16 @@ import com.example.localngalam.presentation.resetPassword.ResetPasswordScreen1
 import com.example.localngalam.presentation.resetPassword.ResetPasswordScreen2
 import com.example.localngalam.presentation.resetPassword.ResetPasswordScreen4
 import com.example.localngalam.presentation.search.SearchScreen
+import com.example.localngalam.data.local.SessionManager
 import okhttp3.Route
 import tempatScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreen(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "login") {
+fun MainScreen(navController: NavHostController, sessionManager: SessionManager) {
+    val startDestination = if (sessionManager.isLoggedIn()) "home" else "login"
+
+    NavHost(navController = navController, startDestination = startDestination) {
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }
         composable("home") { HomeScreen(navController, onClick = {

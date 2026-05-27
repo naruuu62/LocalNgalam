@@ -47,6 +47,18 @@ class ReviewViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun updateReview(reviewId: String, destinationId: String, rating: Int, comment: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val success = reviewRepository.updateReview(reviewId, rating, comment)
+            if (success) {
+                fetchReviews(destinationId)
+                onSuccess()
+            }
+            _isLoading.value = false
+        }
+    }
+
     fun deleteReview(reviewId: String, destinationId: String) {
         viewModelScope.launch {
             val success = reviewRepository.deleteReview(reviewId)

@@ -41,6 +41,7 @@ fun CreatePlanScreen2(navController: NavController, viewModel: planViewModel = v
     var planName by remember { mutableStateOf("") }
     var pilih by remember { mutableStateOf<String?>(null) }
     var tipePerjalanan by remember { mutableStateOf("") }
+    val namaPerjalanan by viewModel.namaPerjalanan.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -77,7 +78,7 @@ fun CreatePlanScreen2(navController: NavController, viewModel: planViewModel = v
             ) {
 
                 Text(
-                    text = "Malang Trip",
+                    text = namaPerjalanan ?: "Rencana Trip",
                     fontSize = 16.sp,
                     fontFamily = poppinsFont,
                     fontWeight = FontWeight.Bold,
@@ -85,7 +86,7 @@ fun CreatePlanScreen2(navController: NavController, viewModel: planViewModel = v
                 )
 
                 Text(
-                    text = "2 of 4",
+                    text = "2 dari 3",
                     fontSize = 12.sp,
                     lineHeight = 24.sp,
                     fontFamily = poppinsFont,

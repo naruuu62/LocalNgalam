@@ -1,15 +1,21 @@
 package com.example.localngalam.presentation.profile
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.localngalam.data.local.SessionManager
+import com.example.localngalam.data.remote.RetrofitClient
+import com.example.localngalam.data.remote.SupabaseConfig
 import com.example.localngalam.data.repository.UserRepository
 import com.example.localngalam.model.UserData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.util.UUID
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -21,6 +27,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _updateSuccess = MutableStateFlow<Boolean?>(null)
+    val updateSuccess: StateFlow<Boolean?> = _updateSuccess
 
     init {
         val userId = sessionManager.getUserId()
@@ -50,6 +59,65 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     noTelepon = ""
                 )
                 Log.w("ProfileViewModel", "Data user tidak ditemukan di tabel users")
+            }
+            _isLoading.value = false
+        }
+    }
+
+    fun updateProfile(namaLengkap: String, bio: String, onSuccess: () -> Unit) {
+        val current = _userData.value ?: return
+        viewModelScope.launch {
+            _isLoading.value = true
+            val updated = current.copy(namaLengkap = namaLengkap, bio = bio)
+            val success = userRepository.upsertUser(updated)
+            if (success) {
+                _userData.value = updated
+                sessionManager.saveUserName(namaLengkap)
+                _updateSuccess.value = true
+                onSuccess()
+            } else {
+                _updateSuccess.value = false
+            }
+            _isLoading.value = false
+        }
+    }
+
+    fun uploadAvatar(uri: Uri, onSuccess: () -> Unit) {
+        val current = _userData.value ?: return
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val context = getApplication<Application>()
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val bytes = inputStream?.readBytes() ?: run {
+                    _isLoading.value = false
+                    return@launch
+                }
+                inputStream.close()
+
+                val filename = "avatar_${current.uid}_${UUID.randomUUID()}.jpg"
+                val requestBody = bytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
+
+                val api = RetrofitClient.authenticated(sessionManager.getAccessToken() ?: "")
+                val response = api.uploadAvatar(filename, requestBody)
+
+                if (response.isSuccessful) {
+                    // Construct public URL (format Supabase Storage v1)
+                    val baseUrl = SupabaseConfig.BASE_URL.trimEnd('/')
+                    val publicUrl = "$baseUrl/storage/v1/object/public/avatars/$filename"
+
+                    // Update user record with new avatar URL
+                    val updated = current.copy(fotoProfil = publicUrl)
+                    val upsertSuccess = userRepository.upsertUser(updated)
+                    if (upsertSuccess) {
+                        _userData.value = updated
+                        onSuccess()
+                    }
+                } else {
+                    Log.e("ProfileViewModel", "Upload gagal: ${response.code()} ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileViewModel", "uploadAvatar exception: ${e.message}", e)
             }
             _isLoading.value = false
         }

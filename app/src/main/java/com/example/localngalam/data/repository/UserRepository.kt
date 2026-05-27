@@ -25,7 +25,8 @@ class UserRepository(private val sessionManager: SessionManager) {
                         namaLengkap = it.namaLengkap,
                         noTelepon = it.noTelepon,
                         email = it.email,
-                        fotoProfil = it.fotoProfil
+                        fotoProfil = it.fotoProfil,
+                        bio = it.bio
                     )
                 }
             } else {
@@ -38,23 +39,27 @@ class UserRepository(private val sessionManager: SessionManager) {
         }
     }
 
-    suspend fun upsertUser(userData: UserData) {
-        try {
+    suspend fun upsertUser(userData: UserData): Boolean {
+        return try {
             val request = UpsertUserRequest(
                 uid = userData.uid,
                 namaLengkap = userData.namaLengkap,
                 noTelepon = userData.noTelepon,
                 email = userData.email,
-                fotoProfil = userData.fotoProfil
+                fotoProfil = userData.fotoProfil,
+                bio = userData.bio
             )
             val response = api().upsertUser(request)
             if (response.isSuccessful) {
                 Log.d(TAG, "User berhasil di-upsert: ${userData.uid}")
+                true
             } else {
                 Log.e(TAG, "upsertUser gagal: ${response.code()} ${response.errorBody()?.string()}")
+                false
             }
         } catch (e: Exception) {
             Log.e(TAG, "upsertUser exception: ${e.message}", e)
+            false
         }
     }
 }
